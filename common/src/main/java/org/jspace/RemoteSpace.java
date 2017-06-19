@@ -57,15 +57,15 @@ public class RemoteSpace implements Space {
 
 	@Override
 	public boolean put(Tuple t) {		
-		ServerMessage responce;
+		ServerMessage response;
 		try {
-			responce = gate.send(ClientMessage.putRequest(t));
+			response = gate.send(ClientMessage.putRequest(t));
 		} catch (IOException e) {
 			// TODO: use log
 			e.printStackTrace();
 			return false;
 		}
-		return responce.isSuccessful();
+		return response.isSuccessful();
 	}
 
 	@Override
@@ -79,16 +79,16 @@ public class RemoteSpace implements Space {
 	}
 
 	private Tuple _get(Template template, boolean isBlocking) {
-		ServerMessage responce;
+		ServerMessage response;
 		try {
-			responce = gate.send(ClientMessage.getRequest(template,isBlocking,false));
+			response = gate.send(ClientMessage.getRequest(template,isBlocking,false));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
-		if (responce.isSuccessful()) {
-			Tuple[] tuples = responce.getTuples();
+		if (response.isSuccessful()) {
+			Tuple[] tuples = response.getTuples();
 			if (tuples.length==0) {
 				return null;
 			}
@@ -99,16 +99,16 @@ public class RemoteSpace implements Space {
 
 	@Override
 	public List<Tuple> getAll(Template template) throws InterruptedException {
-		ServerMessage responce;
+		ServerMessage response;
 		try {
-			responce = gate.send(ClientMessage.getRequest(template,false,true));
+			response = gate.send(ClientMessage.getRequest(template,false,true));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
-		if (responce.isSuccessful()) {
-			return Arrays.asList(responce.getTuples());
+		if (response.isSuccessful()) {
+			return Arrays.asList(response.getTuples());
 		} 
 		return null;		
 	}
@@ -125,15 +125,15 @@ public class RemoteSpace implements Space {
 	}
 
 	private Tuple _query(Template template, boolean isBlocking) {
-		ServerMessage responce;
+		ServerMessage response;
 		try {
-			responce = gate.send(ClientMessage.queryRequest(template,isBlocking,false));
+			response = gate.send(ClientMessage.queryRequest(template,isBlocking,false));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
-		Tuple[] tuples = responce.getTuples();
+		Tuple[] tuples = response.getTuples();
 		if (tuples.length==0) {
 			return null;
 		}
@@ -142,16 +142,16 @@ public class RemoteSpace implements Space {
 
 	@Override
 	public List<Tuple> queryAll(Template template) throws InterruptedException {
-		ServerMessage responce;
+		ServerMessage response;
 		try {
-			responce = gate.send(ClientMessage.queryRequest(template,false,true));
+			response = gate.send(ClientMessage.queryRequest(template,false,true));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
-		if (responce.isSuccessful()) {
-			return Arrays.asList(responce.getTuples());
+		if (response.isSuccessful()) {
+			return Arrays.asList(response.getTuples());
 		} 
 		return null;
 	}

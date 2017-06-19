@@ -24,7 +24,7 @@ import java.util.Iterator;
  * An instance of class <code>Template</code> is used as a pattern to select
  * tuples in a space.
  */
-public class Template implements Iterable<TemplateField>, Serializable {
+public final class Template implements Iterable<TemplateField>, Serializable {
 
 	/**
 	 * 

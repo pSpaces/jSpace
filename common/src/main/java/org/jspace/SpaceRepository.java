@@ -156,7 +156,7 @@ public class SpaceRepository {
 	private ServerMessage handle(ClientMessage message) {
 		switch (message.getMessageType()) {
 		case PUT_REQUEST:
-			return ServerMessage.putResponce( put( message.getTuple() , message.getTarget() ) );
+			return ServerMessage.putResponse( put( message.getTuple() , message.getTarget() ) );
 		case GET_REQUEST:
 			return handleGetRequest( message );
 		case QUERY_REQUEST:
@@ -176,7 +176,7 @@ public class SpaceRepository {
 		try {
 			tuples = query( message.getTemplate() , message.isBlocking(), message.getAll(), message.getTarget() );
 			if (tuples != null) {
-				return ServerMessage.getResponce(tuples);
+				return ServerMessage.getResponse(tuples);
 			} else {
 				return ServerMessage.badRequest();
 			}
@@ -194,7 +194,7 @@ public class SpaceRepository {
 		try {
 			Tuple[] tuples = get( message.getTemplate() , message.isBlocking(), message.getAll(), message.getTarget() );				
 			if (tuples != null) {
-				return ServerMessage.getResponce(tuples);
+				return ServerMessage.getResponse(tuples);
 			} else {
 				return ServerMessage.badRequest();
 			}

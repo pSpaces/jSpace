@@ -21,8 +21,8 @@ package org.jspace.protocol;
  * Represents message type.
  */
 public enum ServerMessageType {
-	PUT_RESPONCE ,
-	GET_RESPONCE ,
-	QUERY_RESPONCE, 
+	PUT_RESPONSE ,
+	GET_RESPONSE ,
+	QUERY_RESPONSE, 
 	FAILURE 
 }

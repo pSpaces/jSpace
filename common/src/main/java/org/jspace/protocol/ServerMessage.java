@@ -182,9 +182,9 @@ public class ServerMessage {
 		return status;
 	}
 
-	public static ServerMessage putResponce(boolean status) {
+	public static ServerMessage putResponse(boolean status) {
 		return new ServerMessage(
-			ServerMessageType.PUT_RESPONCE,// messageType, 
+			ServerMessageType.PUT_RESPONSE,// messageType, 
 			null, //interactionMode, 
 			status, //status 
 			ServerMessage.CODE200, //statusCode, 
@@ -195,9 +195,9 @@ public class ServerMessage {
 		);
 	}
 
-	public static ServerMessage getResponce(Tuple[] tuples) {
+	public static ServerMessage getResponse(Tuple[] tuples) {
 		return new ServerMessage(
-				ServerMessageType.GET_RESPONCE,// messageType, 
+				ServerMessageType.GET_RESPONSE,// messageType, 
 				null, //interactionMode, 
 				true, //status 
 				ServerMessage.CODE200, //statusCode, 

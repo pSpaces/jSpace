@@ -99,7 +99,7 @@ public class TestjSonMessageSerialization {
 		jSonUtils utils = jSonUtils.getInstance();
 		Gson gson = utils.getGson();
 		ServerMessage message = new ServerMessage(
-			ServerMessageType.GET_RESPONCE,
+			ServerMessageType.GET_RESPONSE,
 			InteractionMode.CONN, 
 			true,
 			"202",
@@ -115,7 +115,7 @@ public class TestjSonMessageSerialization {
 		jSonUtils utils = jSonUtils.getInstance();
 		Gson gson = utils.getGson();
 		ServerMessage message = new ServerMessage(
-			ServerMessageType.GET_RESPONCE,
+			ServerMessageType.GET_RESPONSE,
 			InteractionMode.CONN, 
 			true,
 			"202",

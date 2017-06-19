@@ -24,7 +24,7 @@ import java.util.Iterator;
  * A tuple identifies the basic information item. It consists of a sequence of
  * values that can be collected into a knowledge repository.
  */
-public class Tuple implements Iterable<Object>, Serializable {
+public final class Tuple implements Iterable<Object>, Serializable {
 
 	/**
 	 * 
@@ -34,7 +34,7 @@ public class Tuple implements Iterable<Object>, Serializable {
 	/**
 	 * Tuple fields.
 	 */
-	protected Object[] fields;
+	private Object[] fields;
 
 	/**
 	 * Creates a new tuple.
