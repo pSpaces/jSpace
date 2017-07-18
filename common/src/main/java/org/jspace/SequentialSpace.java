@@ -1,83 +1,82 @@
+/**
+ * 
+ * jSpace: a Java Framework for Programming Concurrent and Distributed Applications with Spaces
+ * 
+ * http://pspace.github.io/jSpace/	
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *      Alberto Lluch Lafuente
+ *      Michele Loreti
+ *      Francesco Terrosi
+ */
 package org.jspace;
 
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.List;
 
 public class SequentialSpace implements Space {
 	
-	private final LinkedList<Tuple> tuples;
-	
-	public SequentialSpace(){
-		this.tuples = new LinkedList<Tuple>();
-	}
-	
-	public SequentialSpace(LinkedList<Tuple> tuples){
-		this();
-		this.tuples.addAll( tuples );
-	}
+	protected final LinkedList<Tuple> tuples = new LinkedList<>();
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#put(java.lang.Object[])
+	 */
 	@Override
-	public synchronized boolean put(Tuple t) {
-		boolean result = tuples.add(t);
+	public synchronized boolean put(Object ... fields) {
+		addTuple(new Tuple(Arrays.copyOf(fields, fields.length)));
 		notifyAll();
-		return result;
-	}
-
-	@Override
-	public synchronized Tuple get(Template template) throws InterruptedException {
-		Tuple result = null;
-		while(result == null){
-			result = findTuple(template,true);
-			if (result == null)
-				wait();
-			else
-				return result;
-		}
-		return result;
+		return true;
 	}
 	
-	private Tuple findTuple(Template template,boolean toRemove){
-		Tuple result = null;
+	protected void addTuple(Tuple tuple) {
+		tuples.add(tuple);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#get(org.jspace.TemplateField[])
+	 */
+	@Override
+	public synchronized Object[] get(TemplateField ... fields) throws InterruptedException {
+		while (true) {
+			Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),true);
+			if (result != null) {
+				return result.getTuple();
+			}
+			wait(); 
+		}
+	}
+	
+	protected Tuple findTuple(Template template,boolean toRemove) {
 		Iterator<Tuple> tuplesIterator = tuples.iterator();
-		while(tuplesIterator.hasNext()){
-			result = tuplesIterator.next();
-			if (template.match(result)){
-				if (toRemove)
+		while (tuplesIterator.hasNext()) {
+			Tuple t = tuplesIterator.next();
+			if (template.match(t)) {
+				if (toRemove) {
 					tuplesIterator.remove();
-				return result;
+				}
+				return t;
 			}
 		}
 		return null;
 	}
-	
-	@Override
-	public Tuple getp(Template template){
-		Tuple result = findTuple(template,true);
-		return result;
-	}
 
-	@Override
-	public LinkedList<Tuple> getAll(Template template){
-		LinkedList<Tuple> result = findAllTuples(template,true);
-		return result;
-	}
-	
-	public LinkedList<Tuple> getAll(){
-		LinkedList<Tuple> result = findAllTuples(true);
-		return result;
-	}
-	
-	private synchronized LinkedList<Tuple> findAllTuples(Template template,boolean toRemove){
-		LinkedList<Tuple> result = new LinkedList<Tuple>();
+	protected LinkedList<Object[]> findAllTuples(Template template,boolean toRemove) {
+		LinkedList<Object[]> result = new LinkedList<Object[]>();
 		Iterator<Tuple> tuplesIterator = tuples.iterator();
 		Tuple t;
-		while(tuplesIterator.hasNext()){
+		while (tuplesIterator.hasNext()){
 			t = tuplesIterator.next();
 			if (template.match(t)){
-				result.add(t);
+				result.add(t.getTuple());
 				if (toRemove)
 					tuplesIterator.remove();
 			}
@@ -85,48 +84,61 @@ public class SequentialSpace implements Space {
 		return result;
 	}
 	
-	private synchronized LinkedList<Tuple> findAllTuples(boolean toRemove){
-		LinkedList<Tuple> result = new LinkedList<Tuple>();
-		Iterator<Tuple> tuplesIterator = tuples.iterator();
-		Tuple t;
-		while(tuplesIterator.hasNext()){
-			t = tuplesIterator.next();
-			result.add(t);
-			if (toRemove)
-				tuplesIterator.remove();
-		}
-		return result;
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#getp(org.jspace.TemplateField[])
+	 */
+	@Override
+	public synchronized Object[] getp(TemplateField ... fields) {
+		Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),true);
+		return (result==null?null:result.getTuple());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#getAll(org.jspace.TemplateField[])
+	 */
 	@Override
-	public synchronized Tuple query(Template template) throws InterruptedException {
-		Tuple result = null;
-		while(result == null){
-			result = findTuple(template,false);
-			if (result == null)
-				wait();
-			else
-				return result;
-		}
-		return result;
-	}
-
-	@Override
-	public Tuple queryp(Template template){
-		Tuple result = findTuple(template,false);
-		return result;
-	}
-
-	@Override
-	public LinkedList<Tuple> queryAll(Template template){
-		LinkedList<Tuple> result = findAllTuples(template,false);
+	public synchronized LinkedList<Object[]> getAll(TemplateField ... fields){
+		LinkedList<Object[]> result = findAllTuples(new Template(Arrays.copyOf(fields,fields.length)),true);
 		return result;
 	}
 	
-	public LinkedList<Tuple> queryAll(){
-		LinkedList<Tuple> result = findAllTuples(false);
-		return result;
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#query(org.jspace.TemplateField[])
+	 */
+	@Override
+	public synchronized Object[] query(TemplateField ... fields) throws InterruptedException {
+		while(true){
+			Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),false);
+			if (result != null) {
+				return result.getTuple();
+			}
+			wait();
+		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#queryp(org.jspace.TemplateField[])
+	 */
+	@Override
+	public synchronized Object[] queryp(TemplateField ... fields){
+		Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),false);
+		return (result==null?null:result.getTuple());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.jspace.Space#queryAll(org.jspace.TemplateField[])
+	 */
+	@Override
+	public LinkedList<Object[]> queryAll(TemplateField ... fields){
+		return findAllTuples(new Template(Arrays.copyOf(fields,fields.length)),false);
+	}
+	
 
 //	@Override
 //	public Space map(Function<Tuple, Tuple> f) throws InterruptedException {
@@ -149,7 +161,7 @@ public class SequentialSpace implements Space {
 //	}
 
 	@Override
-	public int size() {
+	public synchronized int size() {
 		return tuples.size();
 	}
 	

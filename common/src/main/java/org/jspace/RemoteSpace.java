@@ -56,11 +56,15 @@ public class RemoteSpace implements Space {
 	}
 
 	@Override
-	public boolean put(Tuple t) {		
+	public boolean put(Object ... fields) {		
 		ServerMessage response;
 		try {
-			response = gate.send(ClientMessage.putRequest(t));
+			response = gate.send(ClientMessage.putRequest(new Tuple(fields)));
 		} catch (IOException e) {
+			// TODO: use log
+			e.printStackTrace();
+			return false;
+		} catch (InterruptedException e) {
 			// TODO: use log
 			e.printStackTrace();
 			return false;
@@ -69,16 +73,16 @@ public class RemoteSpace implements Space {
 	}
 
 	@Override
-	public Tuple get(Template template) throws InterruptedException {
-		return _get(template,true);
+	public Object[] get(TemplateField ... fields) throws InterruptedException {
+		return _get(new Template(fields),true);
 	}
 
 	@Override
-	public Tuple getp(Template template) throws InterruptedException {
-		return _get(template,false);
+	public Object[]  getp(TemplateField ... fields) throws InterruptedException {
+		return _get(new Template(fields),false);
 	}
 
-	private Tuple _get(Template template, boolean isBlocking) {
+	private Object[] _get(Template template, boolean isBlocking) {
 		ServerMessage response;
 		try {
 			response = gate.send(ClientMessage.getRequest(template,isBlocking,false));
@@ -86,45 +90,49 @@ public class RemoteSpace implements Space {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
+		} catch (InterruptedException e) {
+			// TODO: Use log
+			e.printStackTrace();
+			return null;
 		}
 		if (response.isSuccessful()) {
-			Tuple[] tuples = response.getTuples();
-			if (tuples.length==0) {
+			List<Object[]> tuples = response.getTuples();
+			if (tuples.size()==0) {
 				return null;
 			}
-			return tuples[0];
+			return tuples.get(0);
 		}
 		return null;
 	}
 
 	@Override
-	public List<Tuple> getAll(Template template) throws InterruptedException {
+	public List<Object[]> getAll(TemplateField ... fields) throws InterruptedException {
 		ServerMessage response;
 		try {
-			response = gate.send(ClientMessage.getRequest(template,false,true));
+			response = gate.send(ClientMessage.getRequest(new Template(fields),false,true));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
 		if (response.isSuccessful()) {
-			return Arrays.asList(response.getTuples());
+			return response.getTuples();
 		} 
 		return null;		
 	}
 
 
 	@Override
-	public Tuple query(Template template) throws InterruptedException {
-		return _query(template, true);
+	public Object[] query(TemplateField ... fields) throws InterruptedException {
+		return _query(new Template(fields), true);
 	}
 
 	@Override
-	public Tuple queryp(Template template) throws InterruptedException {
-		return _query(template, false);
+	public Object[] queryp(TemplateField ... fields) throws InterruptedException {
+		return _query(new Template(fields), false);
 	}
 
-	private Tuple _query(Template template, boolean isBlocking) {
+	private Object[] _query(Template template, boolean isBlocking) {
 		ServerMessage response;
 		try {
 			response = gate.send(ClientMessage.queryRequest(template,isBlocking,false));
@@ -132,26 +140,30 @@ public class RemoteSpace implements Space {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
-		}
-		Tuple[] tuples = response.getTuples();
-		if (tuples.length==0) {
+		} catch (InterruptedException e) {
+			// TODO: Use log
+			e.printStackTrace();
 			return null;
 		}
-		return tuples[0];
+		List<Object[]> tuples = response.getTuples();
+		if (tuples.size()==0) {
+			return null;
+		}
+		return tuples.get(0);
 	}
 
 	@Override
-	public List<Tuple> queryAll(Template template) throws InterruptedException {
+	public List<Object[]> queryAll(TemplateField ... fields) throws InterruptedException {
 		ServerMessage response;
 		try {
-			response = gate.send(ClientMessage.queryRequest(template,false,true));
+			response = gate.send(ClientMessage.queryRequest(new Template(fields),false,true));
 		} catch (IOException e) {
 			// TODO: Use log
 			e.printStackTrace();
 			return null;
 		}
 		if (response.isSuccessful()) {
-			return Arrays.asList(response.getTuples());
+			return response.getTuples();
 		} 
 		return null;
 	}

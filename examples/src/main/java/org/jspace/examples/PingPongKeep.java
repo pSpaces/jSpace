@@ -1,10 +1,12 @@
 /**
  * 
  */
-package org.jspace.examples.PingPongKeep;
+package org.jspace.examples;
 
 import java.io.IOException;
 
+import org.jspace.ActualField;
+import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
@@ -15,11 +17,11 @@ import org.jspace.Tuple;
  * @author loreti
  *
  */
-public class PingPongConn {
+public class PingPongKeep {
 	
-	public final static String SPACE_URI = "tcp://127.0.0.1:9001/?keep";
-	public final static String PING_URI = "tcp://127.0.0.1:9001/ping?keep";
-	public final static String PONG_URI = "tcp://127.0.0.1:9001/pong?keep";
+	public final static String SPACE_URI = "tcp://127.0.0.1:9001/?conn";
+	public final static String PING_URI = "tcp://127.0.0.1:9001/ping?conn";
+	public final static String PONG_URI = "tcp://127.0.0.1:9001/pong?conn";
 	
 	public static void main( String[] argv ) throws InterruptedException {
 		SpaceRepository repository = new SpaceRepository();
@@ -33,9 +35,9 @@ public class PingPongConn {
 				RemoteSpace pong = new RemoteSpace(PONG_URI);
 				for (int i=0 ; i<10 ; i++ ) {
 					System.out.println("T1: getting PING...");
-					ping.get(new Template("PING"));
+					ping.get(new ActualField("PING"));
 					System.out.println("T1: I have PING!");
-					pong.put(new Tuple("PONG"));
+					pong.put("PONG");
 				}
 				System.out.println("T1 DONE!!!!!");
 			} catch (IOException | InterruptedException e) {
@@ -49,9 +51,9 @@ public class PingPongConn {
 				RemoteSpace ping = new RemoteSpace(PING_URI);
 				RemoteSpace pong = new RemoteSpace(PONG_URI);
 				for (int i=0 ; i<10 ; i++ ) {
-					ping.put(new Tuple("PING"));
+					ping.put("PING");
 					System.out.println("T2: getting PONG...");
-					pong.get(new Template("PONG"));
+					pong.get(new ActualField("PONG"));
 					System.out.println("T2: I have PONG!");
 				}
 				System.out.println("T2 DONE!!!!!");

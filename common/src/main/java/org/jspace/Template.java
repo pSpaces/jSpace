@@ -55,7 +55,7 @@ public final class Template implements Iterable<TemplateField>, Serializable {
 			if (values[i] instanceof TemplateField) {
 				fields[i] = (TemplateField) values[i];
 			} else {
-				fields[i] = new ActualTemplateField(values[i]);
+				fields[i] = new ActualField(values[i]);
 			}
 		}
 		return fields;
@@ -133,6 +133,10 @@ public final class Template implements Iterable<TemplateField>, Serializable {
 
 	public TemplateField getElementAt(int i) {
 		return fields[i];
+	}
+
+	public TemplateField[] getFields() {
+		return fields;
 	}
 
 }

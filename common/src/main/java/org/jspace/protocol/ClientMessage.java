@@ -45,7 +45,7 @@ public class ClientMessage {
 	
 	private final Template template;
 	
-	private final String clientSession;
+	private String clientSession;
 	
 	private final String serverSession;
 	
@@ -280,6 +280,10 @@ public class ClientMessage {
 
 	public boolean getAll() {
 		return all;
+	}
+
+	public void setClientSession(String clientSession) {
+		this.clientSession = clientSession;
 	}
 
 

@@ -75,5 +75,7 @@ public class GateFactory {
 		return gateBuilders.get(scheme);
 	}
 	
-	
+	public void register( String scheme, GateBuilder builder) {
+		gateBuilders.put(scheme, builder);
+	}
 }

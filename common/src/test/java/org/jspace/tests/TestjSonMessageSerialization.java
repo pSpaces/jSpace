@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.jspace.FormalTemplateField;
+import org.jspace.FormalField;
 import org.jspace.Template;
 import org.jspace.Tuple;
 import org.jspace.io.json.jSonUtils;
@@ -31,7 +31,7 @@ public class TestjSonMessageSerialization {
 				"202", 
 				"OK", 
 				new Tuple(1,true,3.0,"4"), 
-				new Template(1,new FormalTemplateField(Integer.class)),
+				new Template(1,new FormalField(Integer.class)),
 				false, false, "clientSession", 
 				"serverSession", 
 				new URI("pspace://127.0.0.1:8080/test?KEEP")
@@ -50,7 +50,7 @@ public class TestjSonMessageSerialization {
 				"202", 
 				"OK", 
 				new Tuple(1,true,3.0,"4\r\n\t\"\""), 
-				new Template(1,new FormalTemplateField(Integer.class)),
+				new Template(1,new FormalField(Integer.class)),
 				false, false, "clientSession", 
 				"serverSession", 
 				new URI("pspace://127.0.0.1:8080/test?KEEP")
@@ -72,7 +72,7 @@ public class TestjSonMessageSerialization {
 				"202", 
 				"OK", 
 				new Tuple(1,true,3.0,"4"), 
-				new Template(1,new FormalTemplateField(Integer.class)),
+				new Template(1,new FormalField(Integer.class)),
 				false, false, "clientSession", 
 				"serverSession", 
 				new URI("pspace://127.0.0.1:8080/test?KEEP")
@@ -84,7 +84,7 @@ public class TestjSonMessageSerialization {
 				"202", 
 				"OK", 
 				new Tuple(1,true,3.0,"4"), 
-				new Template(1,new FormalTemplateField(Integer.class)),
+				new Template(1,new FormalField(Integer.class)),
 				false, false, "clientSession", 
 				"serverSession", 
 				new URI("pspace://127.0.0.1:8080/test?KEEP")

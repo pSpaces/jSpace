@@ -137,12 +137,15 @@ public class SpaceRepository {
 				ClientMessage message;
 				try {
 					message = handler.receive();
+					if (message != null) {
+						handler.send(handle(message));					
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 					message = null;
-				}
-				if (message != null) {
-					handler.send(handle(message));					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					message = null;
 				}
 			}
 			try {
@@ -153,16 +156,16 @@ public class SpaceRepository {
 		});
 	}
 
-	private ServerMessage handle(ClientMessage message) {
+	private ServerMessage handle(ClientMessage message) throws InterruptedException {
 		switch (message.getMessageType()) {
 		case PUT_REQUEST:
-			return ServerMessage.putResponse( put( message.getTuple() , message.getTarget() ) );
+			return ServerMessage.putResponse( put( message.getTarget() , message.getTuple().getTuple() ) , message.getClientSession() );
 		case GET_REQUEST:
 			return handleGetRequest( message );
 		case QUERY_REQUEST:
 			return handleQueryRequest( message );
 		default:
-			return ServerMessage.badRequest();
+			return ServerMessage.badRequest(message.getClientSession());
 		}
 	}
 
@@ -170,15 +173,15 @@ public class SpaceRepository {
 		Template template = message.getTemplate();
 		String target = message.getTarget();
 		if ((template == null)||(target == null)) {
-			return ServerMessage.badRequest();
+			return ServerMessage.badRequest(message.getClientSession());
 		}
-		Tuple[] tuples;
+		List<Object[]> tuples;
 		try {
 			tuples = query( message.getTemplate() , message.isBlocking(), message.getAll(), message.getTarget() );
 			if (tuples != null) {
-				return ServerMessage.getResponse(tuples);
+				return ServerMessage.getResponse(tuples,message.getClientSession() );
 			} else {
-				return ServerMessage.badRequest();
+				return ServerMessage.badRequest(message.getClientSession());
 			}
 		} catch (InterruptedException e) {
 			return ServerMessage.internalServerError();
@@ -189,65 +192,67 @@ public class SpaceRepository {
 		Template template = message.getTemplate();
 		String target = message.getTarget();
 		if ((template == null)||(target == null)) {
-			return ServerMessage.badRequest();
+			return ServerMessage.badRequest(message.getClientSession());
 		}
 		try {
-			Tuple[] tuples = get( message.getTemplate() , message.isBlocking(), message.getAll(), message.getTarget() );				
+			List<Object[]> tuples = get( message.getTemplate() , message.isBlocking(), message.getAll(), message.getTarget() );				
 			if (tuples != null) {
-				return ServerMessage.getResponse(tuples);
+				return ServerMessage.getResponse(tuples,message.getClientSession() );
 			} else {
-				return ServerMessage.badRequest();
+				return ServerMessage.badRequest(message.getClientSession());
 			}
 		} catch (InterruptedException e) {
 			return ServerMessage.internalServerError();
 		}				
 	}
 
-	private Tuple[] get(Template template, boolean blocking, boolean all, String target) throws InterruptedException {
+	private List<Object[]> get(Template template, boolean blocking, boolean all, String target) throws InterruptedException {
 		Space space = spaces.get(target);
 		if (space == null) {
 			return null;
 		}
 		if (all) {
-			List<Tuple> tuples = space.getAll(template);
-			return tuples.toArray(new Tuple[tuples.size()]);
+			return space.getAll(template.getFields());
 		}
-		Tuple t;
+		LinkedList<Object[]> result = new LinkedList<>();
+		Object[] t;
 		if (blocking) {
-			t = space.get(template);
+			t = space.get(template.getFields());
 		} else {
-			t = space.getp(template);
+			t = space.getp(template.getFields());
 		}
-		return (t==null?new Tuple[] {}:new Tuple[] { t });
+		result.add(t);
+		return result;
 	}
 
-	private Tuple[] query(Template template, boolean blocking, boolean all, String target) throws InterruptedException {
+	private List<Object[]> query(Template template, boolean blocking, boolean all, String target) throws InterruptedException {
 		Space space = spaces.get(target);
 		if (space == null) {
 			return null;
 		}
 		if (all) {
-			List<Tuple> tuples = space.queryAll(template);
-			return tuples.toArray(new Tuple[tuples.size()]);
+			return space.queryAll(template.getFields());
 		}
-		Tuple t;
+		LinkedList<Object[]> result = new LinkedList<>();
+		Object[] t;
 		if (blocking) {
-			t = space.query(template);
+			t = space.query(template.getFields());
 		} else {
-			t = space.queryp(template);
+			t = space.queryp(template.getFields());
 		}
-		return (t==null?new Tuple[] {}:new Tuple[] { t });
+		result.add(t);
+		return result;
 	}
 
-	public boolean put(Tuple tuple, String target) {
-		if ((tuple == null)||(target == null)) {
+	public boolean put(String target, Object ... fields) throws InterruptedException {
+		if ((fields == null)||(target == null)) {
 			return false;
 		}
 		Space space = spaces.get(target);
 		if (space == null) {
 			return false;
 		}
-		return space.put(tuple);
+		return space.put(fields);
 	}
 	
 	@Override

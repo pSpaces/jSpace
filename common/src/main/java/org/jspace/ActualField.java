@@ -20,7 +20,7 @@ package org.jspace;
 /**
  * Instances of this class identifies actual template fields.
  */
-public class ActualTemplateField implements TemplateField {
+public class ActualField implements TemplateField {
 
 	/**
 	 * 
@@ -38,7 +38,7 @@ public class ActualTemplateField implements TemplateField {
 	 * @param value
 	 *            field value
 	 */
-	public ActualTemplateField(Object value) {
+	public ActualField(Object value) {
 		if (value == null) { 
 			throw new NullPointerException();
 		}
@@ -57,8 +57,8 @@ public class ActualTemplateField implements TemplateField {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ActualTemplateField) {
-			return value.equals(((ActualTemplateField) obj).value);
+		if (obj instanceof ActualField) {
+			return value.equals(((ActualField) obj).value);
 		} 
 		return false;
 	}

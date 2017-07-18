@@ -154,4 +154,8 @@ public final class Tuple implements Iterable<Object>, Serializable {
 		}; 
 	}
 
+	public Object[] getTuple() {
+		return Arrays.copyOf(this.fields,this.fields.length);
+	}
+
 }

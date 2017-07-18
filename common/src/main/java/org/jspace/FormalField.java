@@ -19,7 +19,7 @@ package org.jspace;
 /**
  * Identifies a formal template field.
  */
-public class FormalTemplateField implements TemplateField {
+public class FormalField implements TemplateField {
 
 	/**
 	 * 
@@ -36,7 +36,7 @@ public class FormalTemplateField implements TemplateField {
 	 * 
 	 * @param type Class of expected field.
 	 */
-	public FormalTemplateField(Class<?> type) {
+	public FormalField(Class<?> type) {
 		this.type = type;
 	}
 
@@ -51,16 +51,16 @@ public class FormalTemplateField implements TemplateField {
 		if (value == null) {//TODO: Are 'null' values allowed in Tuples? 
 			return false;
 		} 
-		if (value instanceof ActualTemplateField) {
-			value = ((ActualTemplateField) value).getValue();
+		if (value instanceof ActualField) {
+			value = ((ActualField) value).getValue();
 		}
 		return (o == null) || (type.isInstance(o));
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof FormalTemplateField) {
-			return type.equals(((FormalTemplateField) obj).type);
+		if (obj instanceof FormalField) {
+			return type.equals(((FormalField) obj).type);
 		}
 		return false;
 	}

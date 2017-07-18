@@ -30,7 +30,7 @@ public interface ClientGate {
 	
 	public void open() throws UnknownHostException, IOException;
 	
-	public ServerMessage send( ClientMessage m ) throws UnknownHostException, IOException;
+	public ServerMessage send( ClientMessage m ) throws UnknownHostException, IOException, InterruptedException;
 	
 	public void close() throws IOException;
 

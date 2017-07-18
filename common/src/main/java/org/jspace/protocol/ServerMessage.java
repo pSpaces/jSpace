@@ -18,6 +18,8 @@
 package org.jspace.protocol;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jspace.Tuple;
 
@@ -100,8 +102,12 @@ public class ServerMessage {
 		return statusMessage;
 	}
 
-	public Tuple[] getTuples() {
-		return tuples;
+	public List<Object[]> getTuples() {
+		LinkedList<Object[]> result = new LinkedList<>();
+		for( int i=0 ; i<tuples.length ; i++ ) {
+			result.add(tuples[i].getTuple());
+		}
+		return result;
 	}
 
 	public String getClientSession() {
@@ -182,7 +188,7 @@ public class ServerMessage {
 		return status;
 	}
 
-	public static ServerMessage putResponse(boolean status) {
+	public static ServerMessage putResponse(boolean status, String clientSession) {
 		return new ServerMessage(
 			ServerMessageType.PUT_RESPONSE,// messageType, 
 			null, //interactionMode, 
@@ -190,25 +196,34 @@ public class ServerMessage {
 			ServerMessage.CODE200, //statusCode, 
 			ServerMessage.OK_STATUS, //statusMessage, 
 			null,//tuples, 
-			null,//clientSession, 
+			clientSession,//clientSession, 
 			null //serverSession
 		);
 	}
 
-	public static ServerMessage getResponse(Tuple[] tuples) {
+	public static ServerMessage getResponse(List<Object[]> tuples, String clientSession) {
 		return new ServerMessage(
 				ServerMessageType.GET_RESPONSE,// messageType, 
 				null, //interactionMode, 
 				true, //status 
 				ServerMessage.CODE200, //statusCode, 
 				ServerMessage.OK_STATUS, //statusMessage, 
-				tuples,//tuples, 
-				null,//clientSession, 
+				toListOfTuples(tuples),//tuples, 
+				clientSession,//clientSession, 
 				null //serverSession
 			);
 	}
 
-	public static ServerMessage badRequest() {
+	private static Tuple[] toListOfTuples(List<Object[]> tuples) {
+		Tuple[] result = new Tuple[tuples.size()];
+		int count = 0;
+		for (Object[] fields : tuples) {
+			result[count++] = new Tuple(fields);
+		}
+		return result;
+	}
+
+	public static ServerMessage badRequest(String clientSession) {
 		return new ServerMessage(
 				ServerMessageType.FAILURE,// messageType, 
 				null, //interactionMode, 
@@ -216,7 +231,7 @@ public class ServerMessage {
 				ServerMessage.CODE400, //statusCode, 
 				ServerMessage.BAD_REQUEST, //statusMessage, 
 				null,//tuples, 
-				null,//clientSession, 
+				clientSession,//clientSession, 
 				null //serverSession
 			);
 	}

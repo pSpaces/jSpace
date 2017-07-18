@@ -21,8 +21,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.jspace.ActualTemplateField;
-import org.jspace.FormalTemplateField;
+import org.jspace.ActualField;
+import org.jspace.FormalField;
 import org.jspace.Template;
 import org.jspace.TemplateField;
 import org.jspace.Tuple;
@@ -181,14 +181,14 @@ public class jSonUtils {
 	
 	
 	public JsonElement jsonFromTeplate( TemplateField field, JsonSerializationContext context ) {
-		if (field instanceof ActualTemplateField) {
-			ActualTemplateField af = (ActualTemplateField) field;
+		if (field instanceof ActualField) {
+			ActualField af = (ActualField) field;
 			JsonObject json = new JsonObject();
 			json.add(jSonUtils.FORMAL_ID, new JsonPrimitive(false));
 			json.add(jSonUtils.VALUE_ID, jsonFromObject(af.getValue(), context));
 			return json;
 		} else {
-			FormalTemplateField ff = (FormalTemplateField) field;
+			FormalField ff = (FormalField) field;
 			JsonObject json = new JsonObject();
 			json.add(jSonUtils.FORMAL_ID, new JsonPrimitive(true));
 			json.add(jSonUtils.VALUE_ID, new JsonPrimitive(dicionary.getURI(ff.getFormalFieldType())));
@@ -207,12 +207,12 @@ public class jSonUtils {
 		boolean isFormal = jo.get(FORMAL_ID).getAsBoolean();
 		if (isFormal) {
 			try {
-				return new FormalTemplateField(dicionary.getClass(jo.get(VALUE_ID).getAsString()));
+				return new FormalField(dicionary.getClass(jo.get(VALUE_ID).getAsString()));
 			} catch (ClassNotFoundException e) {
 				throw new JsonParseException(e);
 			}
 		} else {
-			return new ActualTemplateField(objectFromJson(jo.get(VALUE_ID), context));
+			return new ActualField(objectFromJson(jo.get(VALUE_ID), context));
 		}
 	}	
 	
