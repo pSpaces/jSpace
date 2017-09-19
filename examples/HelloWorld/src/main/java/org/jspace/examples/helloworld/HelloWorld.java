@@ -16,7 +16,6 @@
  */
 package org.jspace.examples.helloworld;
 
-import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
@@ -31,13 +30,11 @@ import org.jspace.Space;
 public class HelloWorld {
 
 	public static void main(String[] argv) throws InterruptedException {
-		Space space = new SequentialSpace();
+		Space inbox = new SequentialSpace();
 		
-		space.put("GREETING","Hello");
-		space.put("NAME","World");
-		Object[] greetingData = space.get(new ActualField("GREETING"), new FormalField(String.class));				
-		Object[] nameData = space.get(new ActualField("NAME"), new FormalField(String.class));				
-		System.out.println(greetingData[1]+" "+nameData[1]+"!");
+		inbox.put("Hello World!");
+		Object[] tuple = inbox.get(new FormalField(String.class));				
+		System.out.println(tuple[0]);
 
 	}
 	
