@@ -4,17 +4,17 @@
 
     <parent>
 	    <groupId>org.pspaces.jspace</groupId>
-	    <artifactId>jspace</artifactId>
+	    <artifactId>examples</artifactId>
 	    <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
-    <packaging>pom</packaging>
-
-    <artifactId>examples</artifactId>
+    <artifactId>helloworld</artifactId>
         
-    <name>Examples</name>
-    <description>A set of examples showing jSpace features.</description>
+    <name>HelloWorld</name>
+    <description>
+    	A simple example showing how spaces can be used to implement the classic Hello World program.
+    </description>
 
 	<dependencies>
         <dependency>
@@ -23,12 +23,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>    
-    
-    <modules>
-        <module>PingPong</module>
-        <module>HelloWorld</module>
-	<module>DiningPhilosophers</module>
-	<module>ProducerConsumer</module>
-    </modules>
-    
  </project>

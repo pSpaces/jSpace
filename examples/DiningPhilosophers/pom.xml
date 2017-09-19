@@ -4,17 +4,18 @@
 
     <parent>
 	    <groupId>org.pspaces.jspace</groupId>
-	    <artifactId>jspace</artifactId>
+	    <artifactId>examples</artifactId>
 	    <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
-    <packaging>pom</packaging>
-
-    <artifactId>examples</artifactId>
+    <artifactId>diningphilosophers</artifactId>
         
-    <name>Examples</name>
-    <description>A set of examples showing jSpace features.</description>
+    <name>Dining Philosophers</name>
+    <description>
+    	Two simple processes that interact via a shared tuple space. Different 
+    	kinds of spaces (local and remote) are used to show different interactions.
+    </description>
 
 	<dependencies>
         <dependency>
@@ -23,12 +24,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>    
-    
-    <modules>
-        <module>PingPong</module>
-        <module>HelloWorld</module>
-	<module>DiningPhilosophers</module>
-	<module>ProducerConsumer</module>
-    </modules>
-    
  </project>
