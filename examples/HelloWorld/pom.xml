@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>org.pspaces.jspace</groupId>
+	    <groupId>org.pspaces.jspace.examples</groupId>
 	    <artifactId>examples</artifactId>
 	    <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
@@ -15,12 +15,5 @@
     <description>
     	A simple example showing how spaces can be used to implement the classic Hello World program.
     </description>
-
-	<dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>    
+    
  </project>

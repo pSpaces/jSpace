@@ -18,7 +18,7 @@
 
 	<dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.pspaces.jspace</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -30,5 +30,6 @@
 	<module>DiningPhilosophers</module>
 	<module>ProducerConsumer</module>
     </modules>
-    
- </project>
+
+    <groupId>org.pspaces.jspace.examples</groupId>
+</project>

@@ -76,4 +76,12 @@
     </dependencies>
 
 
+<distributionManagement>
+    <repository>
+       <id>bintray-michele-loreti-jspace-repo</id>
+       <name>michele-loreti-jspace-repo</name>
+       <url>https://api.bintray.com/maven/pspaces/jspace-repo/jspace/;publish=1</url>
+    </repository>
+ </distributionManagement>
+ 
 </project>
