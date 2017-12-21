@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>org.pspaces.jspace</groupId>
+	    <groupId>io.github.pspaces</groupId>
 	    <artifactId>jspace</artifactId>
 	    <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
@@ -13,5 +13,6 @@
         
     <name>Core API</name>
     <description>jSpace core API.</description>
-    
- </project>
+
+    <groupId>io.github.pspaces.jspace</groupId>
+</project>

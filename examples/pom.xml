@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>org.pspaces.jspace</groupId>
+	    <groupId>io.github.pspaces</groupId>
 	    <artifactId>jspace</artifactId>
 	    <version>1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
@@ -11,6 +11,7 @@
 
     <packaging>pom</packaging>
 
+    <groupId>io.github.pspaces.jspace</groupId>
     <artifactId>examples</artifactId>
         
     <name>Examples</name>
@@ -18,11 +19,12 @@
 
 	<dependencies>
         <dependency>
-            <groupId>org.pspaces.jspace</groupId>
+            <groupId>io.github.pspaces.jspace</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>    
+    
     
     <modules>
         <module>PingPong</module>
@@ -31,5 +33,4 @@
 	<module>ProducerConsumer</module>
     </modules>
 
-    <groupId>org.pspaces.jspace.examples</groupId>
 </project>

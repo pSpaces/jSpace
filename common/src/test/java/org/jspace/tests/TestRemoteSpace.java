@@ -92,7 +92,7 @@ public class TestRemoteSpace {
 	@Test
 	public void testConcurrentKeep1() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
-		sr.addGate("tcp://127.0.0.1:9902/?keep");
+		sr.addGate("tcp://127.0.0.1:9903/?keep");
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
 		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9902/target?conn");
