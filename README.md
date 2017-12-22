@@ -21,7 +21,7 @@ This creates a folder (named ```jSpace```) containing all the source code.
 
 You can also download the zip archive of the same folder from this [link](https://github.com/pSpaces/jSpace/archive/master.zip).
 
-Maven can now be used to build and test jSpace:
+Maven can now be used to build and test jSpace. Open a console and enter into the folder ```jSpace``` and type:
 
 ```
 mvn clean verify
