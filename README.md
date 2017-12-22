@@ -14,7 +14,7 @@ jSpace requires [Java 1.8](https://java.com/) (or higher). Moreover, jSpace is u
 You can download jSpace source code either by cloning the GitHub repository:
 
 ```
-git clone git@github.com:pSpaces/jSpace.git
+git clone https://github.com/pSpaces/jSpace.git
 ```
 
 This creates a folder (named ```jSpace```) containing all the source code.
