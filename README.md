@@ -109,7 +109,7 @@ public class App {
 }
 ```
 
-To build and test your application with Maven the following command can be executed:
+To build and test your application with Maven the following command can be executed un the directory ```myjspaceapp```:
 
 ```
 mvn clean verify
@@ -119,9 +119,9 @@ Generated files are stored in the directory ```target```. In particular, you can
 
 To run your app you need also to provide a reference to all the required packages. This are located in your local Maven repository and it may be not convenient to explicitly refer to them.
 
-You can modify you ```pom.xml``` to let Maven generate a jar files where all the required classes are included.
+You can modify file ```pom.xml``` to let Maven generate a jar files where all the required classes are included.
 
-Open file ```pom.xml``` and add the following code:
+Open file ```myjspaceapp/pom.xml``` and add the following code just before the closing tag ```</project>```:
 
 ```
 <build>
