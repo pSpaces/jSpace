@@ -3,7 +3,7 @@ jSpace is a Java library that supports programming of Concurrent and Distributed
 
 jSpace borns as a fork of jResp (https://github.com/michele-loreti/jResp).
 
-#Getting Started with jSpace
+# Getting Started with jSpace
 Below you can find detailed instructions that show how you can use jSpace
 to develop your applications.
 
