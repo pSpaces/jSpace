@@ -18,6 +18,8 @@ Open Eclipse and select "File -> New -> Project" menu:
 
 ![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step7.png)
 
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step8.png)
+
 ```
 mvn -B archetype:generate \
   -DarchetypeGroupId=org.apache.maven.archetypes \
