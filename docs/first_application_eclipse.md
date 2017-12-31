@@ -4,7 +4,19 @@ If you have successfully [built and installed](getting_started.md) you can use E
 
 Open Eclipse and select "File -> New -> Project" menu:
 
-![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step1.png){:height="36px" width="36px"}
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step1.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step2.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step3.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step4.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step5.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step6.png)
+
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step7.png)
 
 ```
 mvn -B archetype:generate \
