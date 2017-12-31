@@ -4,7 +4,7 @@ If you have successfully [built and installed](getting_started.md) you can use E
 
 Open Eclipse and select "File -> New -> Project" menu:
 
-
+![Spaces, repositories and gates](figs/jspace_eclipse_tutorial_step1.png)
 
 ```
 mvn -B archetype:generate \
