@@ -9,4 +9,4 @@ jSpace requires [Java 1.8](https://java.com/) (or higher). Moreover, jSpace is u
 ## Tutorial
 
 1. [Building and Installing jSpace](./getting_started.md)
-2. [Import jSpace Code in Eclipse](./jspace_eclipse.md)
+2. [Import jSpace Code in Eclipse](./eclipse_jspace.md)
