@@ -1,5 +1,5 @@
 # Your first jSpace applications (with Maven)
-If you have successfully [built and installed](gettin_started.md)  you have You can use Maven to generate an empty jSpace project:
+If you have successfully [built and installed](getting_started.md)  you have You can use Maven to generate an empty jSpace project:
 
 ```
 mvn -B archetype:generate \
