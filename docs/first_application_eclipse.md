@@ -2,6 +2,9 @@
 # Your first jSpace applications (with Eclipse)
 If you have successfully [built and installed](getting_started.md) you can use Eclipse to develop your first jSpace Application. In fact you will use Eclipse as an IDE and Maven to manage dependencies. 
 
+Open Eclipse and select "File -> New -> Project" menu:
+
+
 
 ```
 mvn -B archetype:generate \
