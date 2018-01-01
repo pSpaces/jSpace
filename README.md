@@ -12,4 +12,4 @@ jSpace requires [Java 1.8](https://java.com/) (or higher). Moreover, jSpace is u
 2. [Import jSpace Code in Eclipse](./docs/eclipse_jspace.md)
 3. [Your first jSpace App in Eclipse](./docs/first_application_eclipse.md)
 4. [Your first jSpace App with Maven](./docs/first_application_maven.md)
-5. [Configuring Serializaiton in jSpace](./docs/jspace_serialization.md)
+5. [Configuring Serialization in jSpace](./docs/jspace_serialization.md)
