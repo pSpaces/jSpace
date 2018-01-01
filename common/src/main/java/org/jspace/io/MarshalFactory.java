@@ -45,7 +45,8 @@ public class MarshalFactory {
 	}
 
 	private void init() {
-		table.put("json", JSonMarshaller.class); 
+		table.put("json", JSonMarshaller.class);
+		table.put("binary", BinaryMarshaller.class);
 	}
 	
 	public jSpaceMarshaller getMarshaller( String code ) {
