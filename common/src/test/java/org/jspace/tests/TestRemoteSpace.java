@@ -121,4 +121,12 @@ public class TestRemoteSpace {
 		
 	}
 	
+	public void testCloseGate() {
+		String uri = "tcp://127.0.0.1:9900/?keep";
+		
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate(uri);
+		sr.closeGate(uri);
+	}
+	
 }
