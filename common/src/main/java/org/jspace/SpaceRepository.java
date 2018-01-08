@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.jspace.gate.ClientHandler;
 import org.jspace.gate.GateFactory;
@@ -135,6 +134,28 @@ public class SpaceRepository {
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Closes the gate represented by the specific uri, and terminates the underlying thread.
+	 * 
+	 * @param uri
+	 */
+    public void closeGate(String uri) {
+    	closeGate(URI.create(uri));
+    }
+
+	private void closeGate(URI uri) {
+		this.gates.stream()
+					.filter(g -> g.getURI().equals(uri))
+					.findFirst()
+					.ifPresent(g -> {
+						try {
+							g.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					});
 	}
 
 	private void addHandler(ClientHandler handler) {

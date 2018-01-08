@@ -1,2 +1,7 @@
 /.DS_Store
 /settings_xml
+
+.classpath
+.project
+.settings/
+bin/
