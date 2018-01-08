@@ -31,7 +31,7 @@ import java.util.HashMap;
  */
 public class MarshalFactory {
 	
-	public final static String LANGUAGE_PARAMETE = "lang";
+	public final static String LANGUAGE_PARAMETER = "lang";
 	
 	public final static String JSON_CODE = "json";
 

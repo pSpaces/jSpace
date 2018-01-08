@@ -79,7 +79,7 @@ public class SpaceRepository {
 	 * @param name space name
 	 * @param space space added to the repository
 	 */
-	public void add(String name, Space space) {
+	public synchronized void add(String name, Space space) {
 		if (spaces.containsKey(name)) {
 			throw new IllegalStateException("Name "+name+" is already used in the repository!");
 		}
@@ -103,7 +103,7 @@ public class SpaceRepository {
 	 * @return the space previously identified by <code>name</code>, 
 	 * null if no space is named <code>name</code>.
 	 */
-	public Space remove(String name) {
+	public synchronized Space remove(String name) {
 		return spaces.remove(name);
 	}
 	
@@ -142,15 +142,21 @@ public class SpaceRepository {
 	 * @param uri
 	 */
     public void closeGate(String uri) {
-    	closeGate(URI.create(uri));
+    		closeGate(URI.create(uri));
     }
 
-	private void closeGate(URI uri) {
+	/**
+	 * Closes the gate represented by the specific uri, and terminates the underlying thread.
+	 * 
+	 * @param uri
+	 */
+	public void closeGate(URI uri) {
 		this.gates.stream()
 					.filter(g -> g.getURI().equals(uri))
 					.findFirst()
 					.ifPresent(g -> {
 						try {
+							this.gates.remove(g);
 							g.close();
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -158,6 +164,20 @@ public class SpaceRepository {
 					});
 	}
 
+	public void closeGate(ServerGate gate) {
+		if (gate == null) {
+			return ;
+		}
+		boolean flag = this.gates.remove(gate);
+		if (flag) {
+			try {
+				gate.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private void addHandler(ClientHandler handler) {
 		executor.execute(() -> {
 			while (handler.isActive()) {
@@ -271,11 +291,23 @@ public class SpaceRepository {
 		return result;
 	}
 
+	/**
+	 * Adds a tuple in the space.
+	 * 
+	 * @param target target space
+	 * @param fields fields fields of inserted tuple
+	 * @return true if the action has been successfully executed false otherwise.
+	 * @throws InterruptedException if any thread interrupted the current thread before 
+	 * the action is executed.
+	 */
 	public boolean put(String target, Object ... fields) throws InterruptedException {
 		if ((fields == null)||(target == null)) {
 			return false;
 		}
-		Space space = spaces.get(target);
+		Space space;
+		synchronized (this) {
+			space = spaces.get(target);			
+		}
 		if (space == null) {
 			return false;
 		}
@@ -284,10 +316,18 @@ public class SpaceRepository {
 	
 	@Override
 	protected void finalize() throws Throwable {
+		this.closeGates();
+	}
+
+	public void closeGates() {
 		for (ServerGate g : gates) {
-			g.close();
+			try {
+				g.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		super.finalize();
+		this.gates = new LinkedList<>();
 	}
 
 	
