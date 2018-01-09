@@ -46,10 +46,7 @@ public class SequentialSpace implements Space {
 	 * @param bound max number of tuples in the space.
 	 */
 	public SequentialSpace(int bound) {
-		if (bound == 0) {
-			throw new IllegalArgumentException("Bound parameter cannot be 0!");
-		}
-		this.bound = (bound<0?-1:bound);
+		this.bound = (bound<=0?-1:bound);
 	}
 	
 	/*
