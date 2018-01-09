@@ -23,16 +23,20 @@
 
 package org.jspace;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-
-public class LIFOSpace extends FIFOSpace {
+public class PileSpace extends SequentialSpace {
 	
+	public PileSpace() {
+		this(-1);
+	}
+	
+	public PileSpace(int bound) {
+		super(bound);
+	}
+
 	@Override
 	protected void addTuple(Tuple tuple) {
 		tuples.push(tuple);
 	}
 
+	
 }

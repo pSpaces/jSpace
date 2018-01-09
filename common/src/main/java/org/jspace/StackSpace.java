@@ -23,47 +23,26 @@
 
 package org.jspace;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-
-public class FIFOSpace extends SequentialSpace {
+public class StackSpace extends QueueSpace {
 	
+	/**
+	 * Create an unbounded space based on stack.
+	 */
+	public StackSpace() {
+		this(-1);
+	}
+
+	/**
+	 * Create a space based on stack of max size <code>bound</code>.
+	 * @param bound
+	 */
+	public StackSpace(int bound) {
+		super(bound);
+	}
+
 	@Override
 	protected void addTuple(Tuple tuple) {
-		tuples.add(tuple);
-	}
-	
-	@Override
-	protected Tuple findTuple(Template template,boolean toRemove) {
-		Tuple t = tuples.peek();
-		if ((t!=null)&&(template.match(t))) {
-			if (toRemove) {
-				tuples.poll();
-			}
-			return t;
-		} else {
-			return null;
-		}		
-	}
-
-	@Override
-	protected LinkedList<Object[]> findAllTuples(Template template,boolean toRemove) {
-		LinkedList<Object[]> result = new LinkedList<Object[]>();
-		Iterator<Tuple> tuplesIterator = tuples.iterator();
-		Tuple t;
-		while (tuplesIterator.hasNext()){
-			t = tuplesIterator.next();
-			if (template.match(t)) {
-				result.add(t.getTuple());
-				if (toRemove)
-					tuplesIterator.remove();
-			} else {
-				break ;
-			}
-		}
-		return result;
+		tuples.push(tuple);
 	}
 
 }
