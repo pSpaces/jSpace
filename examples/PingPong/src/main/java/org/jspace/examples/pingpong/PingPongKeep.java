@@ -35,9 +35,9 @@ import org.jspace.SpaceRepository;
  */
 public class PingPongKeep {
 	
-	public final static String SPACE_URI = "tcp://127.0.0.1:9001/?conn";
-	public final static String PING_URI = "tcp://127.0.0.1:9001/ping?conn";
-	public final static String PONG_URI = "tcp://127.0.0.1:9001/pong?conn";
+	public final static String SPACE_URI = "tcp://127.0.0.1:9001/?keep";
+	public final static String PING_URI = "tcp://127.0.0.1:9001/ping?keep";
+	public final static String PONG_URI = "tcp://127.0.0.1:9001/pong?keep";
 	
 	public static void main( String[] argv ) throws InterruptedException, UnknownHostException, IOException {
 		SpaceRepository repository = new SpaceRepository();
