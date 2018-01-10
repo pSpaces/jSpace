@@ -47,6 +47,7 @@ public class SpaceRepository {
 	private ExecutorService executor = Executors.newCachedThreadPool();
 	private GateFactory gateFactory;
 	private LinkedList<ServerGate> gates = new LinkedList<>();
+	private LinkedList<ClientHandler> handlers = new LinkedList<>();
 	
 	/**
 	 * Creates a new respository.
@@ -178,7 +179,8 @@ public class SpaceRepository {
 		}
 	}
 	
-	private void addHandler(ClientHandler handler) {
+	private synchronized void addHandler(ClientHandler handler) {
+		handlers.add(handler);
 		executor.execute(() -> {
 			while (handler.isActive()) {
 				ClientMessage message;
@@ -200,7 +202,12 @@ public class SpaceRepository {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			removeHandler(handler);
 		});
+	}
+	
+	private synchronized void removeHandler(ClientHandler handler) {
+		handlers.remove(handler);
 	}
 
 	private ServerMessage handle(ClientMessage message) throws InterruptedException {
@@ -331,7 +338,17 @@ public class SpaceRepository {
 	}
 
 	
-	
+	public void shutDown() {
+		this.closeGates();
+		for (ClientHandler handler : handlers) {
+			try {
+				handler.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		this.executor.shutdownNow();
+	}
 	
 
 }

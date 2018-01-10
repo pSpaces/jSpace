@@ -86,6 +86,7 @@ public class KeepClientHandler implements ClientHandler {
 	@Override
 	public void close() throws IOException {
 		client.close();
+		isActive = false;
 	}
 
 }

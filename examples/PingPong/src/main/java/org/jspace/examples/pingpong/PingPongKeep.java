@@ -45,15 +45,19 @@ public class PingPongKeep {
 		repository.add("ping", new SequentialSpace());
 		repository.add("pong", new SequentialSpace());
 
+		RemoteSpace rs1 = new RemoteSpace(PONG_URI) ;
+		RemoteSpace rs2 = new RemoteSpace(PONG_URI);
 
-		Thread t1 = new Thread( new PingAgent(new RemoteSpace(PING_URI), new RemoteSpace(PONG_URI)) );
-		Thread t2 = new Thread( new PongAgent(new RemoteSpace(PING_URI), new RemoteSpace(PONG_URI)) );
+		Thread t1 = new Thread( new PingAgent(new RemoteSpace(PING_URI),rs1));
+		Thread t2 = new Thread( new PongAgent(new RemoteSpace(PING_URI), rs2) );
 		
 		t1.start();
 		t2.start();
 		
 		t1.join();
-		t2.join();		
+		t2.join();	
+
+		repository.shutDown();
 	}
 	
 

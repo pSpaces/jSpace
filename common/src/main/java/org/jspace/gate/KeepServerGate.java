@@ -62,13 +62,15 @@ public class KeepServerGate implements ServerGate {
 
 	@Override
 	public void close() throws IOException {
-		this.ssocket.close();
+		if (this.ssocket != null) {
+			this.ssocket.close();		
+		}
 	}
 
 	@Override
 	public URI getURI() {
 		try {
-			return new URI("socket://"+address+"/"+"?"+KEEP_CODE);
+			return new URI("tcp:/"+address+"/"+"?"+KEEP_CODE);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;

@@ -196,4 +196,7 @@ public class RemoteSpace implements Space {
 //		return null;
 //	}
 
+	public void close() throws IOException {
+		gate.close();
+	}
 }

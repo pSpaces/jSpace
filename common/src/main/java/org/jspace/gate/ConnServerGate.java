@@ -62,13 +62,15 @@ public class ConnServerGate implements ServerGate {
 
 	@Override
 	public void close() throws IOException {
-		this.ssocket.close();
+		if (this.ssocket != null) {
+			this.ssocket.close();
+		}
 	}
 
 	@Override
 	public URI getURI() {
 		try {
-			return new URI("socket://"+address+"/"+"?"+CONN_CODE);
+			return new URI("tcp:/"+address+"/"+"?"+CONN_CODE);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;

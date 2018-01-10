@@ -20,41 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.jspace.examples.pingpong;
+package org.jspace.tests;
+
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
+import java.net.URI;
 
-import org.jspace.RemoteSpace;
-import org.jspace.SequentialSpace;
-import org.jspace.SpaceRepository;
+import org.jspace.gate.GateFactory;
+import org.jspace.gate.ServerGate;
+import org.jspace.gate.TcpGateBuilder;
+import org.junit.Test;
 
 /**
  * @author loreti
  *
  */
-public class PingPongConn {
+public class TestGates {
 	
-	public final static String SPACE_URI = "tcp://127.0.0.1:9001/?conn";
-	public final static String PING_URI = "tcp://127.0.0.1:9001/ping?conn";
-	public final static String PONG_URI = "tcp://127.0.0.1:9001/pong?conn";
-	
-	public static void main( String[] argv ) throws InterruptedException, UnknownHostException, IOException {
-		SpaceRepository repository = new SpaceRepository();
-		repository.addGate(SPACE_URI);
-		repository.add("ping", new SequentialSpace());
-		repository.add("pong", new SequentialSpace());
+	@Test
+	public void testKeepGate() throws IOException {
+		String uri = "tcp://127.0.0.1:9900/?keep";
+		TcpGateBuilder builder = new TcpGateBuilder();
+		ServerGate gate = builder.createServerGate(URI.create(uri));
+		assertEquals(URI.create(uri), gate.getURI());
+		gate.close();
+	}
 
-
-		Thread t1 = new Thread( new PingAgent(new RemoteSpace(PING_URI), new RemoteSpace(PONG_URI)) );
-		Thread t2 = new Thread( new PongAgent(new RemoteSpace(PING_URI), new RemoteSpace(PONG_URI)) );
-		
-		t1.start();
-		t2.start();
-		
-		t1.join();
-		t2.join();		
-		repository.shutDown();
-	}	
+	@Test
+	public void testConnGate() throws IOException {
+		String uri = "tcp://127.0.0.1:9900/?conn";
+		TcpGateBuilder builder = new TcpGateBuilder();
+		ServerGate gate = builder.createServerGate(URI.create(uri));
+		assertEquals(URI.create(uri), gate.getURI());
+		gate.close();
+	}
 
 }
