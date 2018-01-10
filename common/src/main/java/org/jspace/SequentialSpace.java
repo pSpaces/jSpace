@@ -109,7 +109,6 @@ public class SequentialSpace implements Space {
 					tuplesIterator.remove();
 			}
 		}
-		notifyAll();
 		return result;
 	}
 	
@@ -171,7 +170,7 @@ public class SequentialSpace implements Space {
 	 * @see org.jspace.Space#queryAll(org.jspace.TemplateField[])
 	 */
 	@Override
-	public LinkedList<Object[]> queryAll(TemplateField ... fields){
+	public synchronized LinkedList<Object[]> queryAll(TemplateField ... fields){
 		return findAllTuples(new Template(Arrays.copyOf(fields,fields.length)),false);
 	}
 	

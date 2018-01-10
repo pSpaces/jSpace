@@ -59,6 +59,18 @@ public class TestSpaces {
  	}
 
 	@Test
+	public void testSequentialQAll() throws InterruptedException {
+		SequentialSpace sp = new SequentialSpace();
+		sp.put(1);
+		sp.put("2");
+		sp.put(3);
+		LinkedList<Object[]> data = sp.queryAll(new FormalField(Integer.class));
+		assertEquals(2, data.size());
+		assertEquals(1, data.get(0)[0]);
+		assertEquals(3, data.get(1)[0]);
+ 	}
+
+	@Test
 	public void testPile() throws InterruptedException {
 		PileSpace sp = new PileSpace();
 		sp.put(1);
@@ -76,6 +88,18 @@ public class TestSpaces {
 		sp.put("2");
 		sp.put(3);
 		LinkedList<Object[]> data = sp.getAll(new FormalField(Integer.class));
+		assertEquals(2, data.size());
+		assertEquals(3, data.get(0)[0]);
+		assertEquals(1, data.get(1)[0]);
+ 	}
+
+	@Test
+	public void testPileQAll() throws InterruptedException {
+		PileSpace sp = new PileSpace();
+		sp.put(1);
+		sp.put("2");
+		sp.put(3);
+		LinkedList<Object[]> data = sp.queryAll(new FormalField(Integer.class));
 		assertEquals(2, data.size());
 		assertEquals(3, data.get(0)[0]);
 		assertEquals(1, data.get(1)[0]);
@@ -104,6 +128,17 @@ public class TestSpaces {
  	}
 
 	@Test
+	public void testStackQAll() throws InterruptedException {
+		StackSpace sp = new StackSpace();
+		sp.put(1);
+		sp.put("2");
+		sp.put(3);
+		LinkedList<Object[]> data = sp.queryAll(new FormalField(Integer.class));
+		assertEquals(1, data.size());
+		assertEquals(3, data.get(0)[0]);
+ 	}
+
+	@Test
 	public void testQueue() throws InterruptedException {
 		QueueSpace sp = new QueueSpace();
 		sp.put(1);
@@ -121,6 +156,17 @@ public class TestSpaces {
 		sp.put("2");
 		sp.put(3);
 		LinkedList<Object[]> data = sp.getAll(new FormalField(Integer.class));
+		assertEquals(1, data.size());
+		assertEquals(1, data.get(0)[0]);
+ 	}
+
+	@Test
+	public void testQueueQAll() throws InterruptedException {
+		QueueSpace sp = new QueueSpace();
+		sp.put(1);
+		sp.put("2");
+		sp.put(3);
+		LinkedList<Object[]> data = sp.queryAll(new FormalField(Integer.class));
 		assertEquals(1, data.size());
 		assertEquals(1, data.get(0)[0]);
  	}
