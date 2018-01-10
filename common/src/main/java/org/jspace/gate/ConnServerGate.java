@@ -37,15 +37,16 @@ import org.jspace.io.jSpaceMarshaller;
  */
 public class ConnServerGate implements ServerGate {
 	
-	private jSpaceMarshaller marshaller;
-	private static final String CONN_CODE = "CONN";
-	private InetSocketAddress address;
-	private int backlog;
+	private final jSpaceMarshaller marshaller;
+	private static final String CONN_CODE = "conn";
+	private final InetSocketAddress address;
+	private final int backlog;
 	private ServerSocket ssocket;
 	
 	public ConnServerGate(jSpaceMarshaller marshaller, InetSocketAddress address, int backlog) {
 		this.address = address;
 		this.backlog = backlog;
+		this.marshaller = marshaller;
 	}
 	
 

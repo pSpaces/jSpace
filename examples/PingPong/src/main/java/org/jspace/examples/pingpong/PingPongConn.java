@@ -54,6 +54,7 @@ public class PingPongConn {
 		
 		t1.join();
 		t2.join();		
+		repository.closeGates();
 	}	
 
 }

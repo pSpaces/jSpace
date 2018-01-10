@@ -38,7 +38,7 @@ import org.jspace.io.jSpaceMarshaller;
 public class KeepServerGate implements ServerGate {
 	
 	private jSpaceMarshaller marshaller;
-	private static final String KEEP_CODE = "KEEP";
+	private static final String KEEP_CODE = "keep";
 	private InetSocketAddress address;
 	private int backlog;
 	private ServerSocket ssocket;

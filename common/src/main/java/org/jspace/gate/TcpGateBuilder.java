@@ -40,8 +40,8 @@ public class TcpGateBuilder implements GateBuilder {
 	public static final int DEFAULT_PORT = 9990;
 	public static final String DEFAULT_MODE = "keep";
 	
-	public static final String KEEP_MODE = "KEEP";
-	public static final String CONN_MODE = "CONN";
+	public static final String KEEP_MODE = "keep";
+	public static final String CONN_MODE = "conn";
 	public static final String PUSH_MODE = "PUSH";
 	public static final String PULL_MODE = "PULL";
 
@@ -61,15 +61,16 @@ public class TcpGateBuilder implements GateBuilder {
 		}
 		HashMap<String,String> query = GateFactory.parseQuery(uri.getQuery());
 		jSpaceMarshaller marshaller = getMarshaller(query.get(GateFactory.LANGUAGE_QUERY_ELEMENT));
-		String mode = query.getOrDefault(GateFactory.MODE_QUERY_ELEMENT,DEFAULT_MODE).toUpperCase();
-		if (KEEP_MODE.equals(mode)) {
+		//String mode = query.getOrDefault(GateFactory.MODE_QUERY_ELEMENT,DEFAULT_MODE).toUpperCase();
+		if (query.containsKey(KEEP_MODE)) {
 			return new KeepClientGate(marshaller, host, port, target);
 		}
-		if (CONN_MODE.equals(mode)) {
+		if (query.containsKey(CONN_MODE)) {
 			return new ConnClientGate(marshaller, host, port, target);
 		}
 		//TODO: Add here other modes!
-		return null;
+		//Default mode
+		return new KeepClientGate(marshaller, host, port, target);
 	}
 
 	/* (non-Javadoc)
@@ -85,11 +86,14 @@ public class TcpGateBuilder implements GateBuilder {
 		HashMap<String,String> query = GateFactory.parseQuery(uri.getQuery());
 		jSpaceMarshaller marshaller = getMarshaller(query.get(GateFactory.LANGUAGE_QUERY_ELEMENT));
 		String mode = query.getOrDefault(GateFactory.MODE_QUERY_ELEMENT,DEFAULT_MODE).toUpperCase();
-		if (KEEP_MODE.equals(mode)) {
+		if (query.containsKey(KEEP_MODE)) {
 			return new KeepServerGate(marshaller,new InetSocketAddress(host, port),DEFAULT_BACKLOG);
 		}
+		if (query.containsKey(CONN_MODE)) {
+			return new ConnServerGate(marshaller, new InetSocketAddress(host, port),DEFAULT_BACKLOG);
+		}
 		//TODO: Add here other modes!
-		return null;
+		return new KeepServerGate(marshaller,new InetSocketAddress(host, port),DEFAULT_BACKLOG);
 	}
 
 	public jSpaceMarshaller getMarshaller( String code ) {
