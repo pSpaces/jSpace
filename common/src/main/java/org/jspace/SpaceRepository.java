@@ -127,11 +127,13 @@ public class SpaceRepository {
 					addHandler( handler );
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-				try {
-					gate.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				if (!gate.isClosed()) {
+					e.printStackTrace();
+					try {
+						gate.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}	
 				}
 			}
 		});

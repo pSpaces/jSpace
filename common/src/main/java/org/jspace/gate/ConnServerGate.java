@@ -66,6 +66,11 @@ public class ConnServerGate implements ServerGate {
 			this.ssocket.close();
 		}
 	}
+	
+	@Override
+	public boolean isClosed() {
+		return this.ssocket.isClosed();
+	}
 
 	@Override
 	public URI getURI() {
@@ -76,5 +81,4 @@ public class ConnServerGate implements ServerGate {
 			return null;
 		}
 	}
-
 }

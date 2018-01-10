@@ -66,6 +66,11 @@ public class KeepServerGate implements ServerGate {
 			this.ssocket.close();		
 		}
 	}
+	
+	@Override
+	public boolean isClosed() {
+		return this.ssocket.isClosed();
+	}
 
 	@Override
 	public URI getURI() {
