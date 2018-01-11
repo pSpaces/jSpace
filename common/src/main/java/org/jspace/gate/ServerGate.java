@@ -38,6 +38,8 @@ public interface ServerGate {
 	
 	public void close( ) throws IOException;
 	
+	public boolean isClosed();
+	
 	public URI getURI();
 	
 }

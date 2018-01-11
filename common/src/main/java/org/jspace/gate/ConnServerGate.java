@@ -42,6 +42,7 @@ public class ConnServerGate implements ServerGate {
 	private final InetSocketAddress address;
 	private final int backlog;
 	private ServerSocket ssocket;
+	private boolean isOpen = false;
 	
 	public ConnServerGate(jSpaceMarshaller marshaller, InetSocketAddress address, int backlog) {
 		this.address = address;
@@ -52,6 +53,7 @@ public class ConnServerGate implements ServerGate {
 
 	@Override
 	public void open() throws IOException {
+		this.isOpen = true;
 		this.ssocket = new ServerSocket(address.getPort(), backlog, address.getAddress());
 	}
 
@@ -62,9 +64,15 @@ public class ConnServerGate implements ServerGate {
 
 	@Override
 	public void close() throws IOException {
+		this.isOpen = false;
 		if (this.ssocket != null) {
 			this.ssocket.close();
 		}
+	}
+	
+	@Override
+	public boolean isClosed() {
+		return !this.isOpen;
 	}
 
 	@Override
@@ -76,5 +84,4 @@ public class ConnServerGate implements ServerGate {
 			return null;
 		}
 	}
-
 }
