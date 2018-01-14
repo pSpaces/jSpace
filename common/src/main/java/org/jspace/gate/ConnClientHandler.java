@@ -58,7 +58,7 @@ public class ConnClientHandler implements ClientHandler {
 	@Override
 	public ClientMessage receive() throws IOException {
 		ClientMessage message = marshaller.read(ClientMessage.class, reader);
-		isActive  = (message != null);
+		isActive  = (message == null);
 		return message;
 	}
 
@@ -67,11 +67,13 @@ public class ConnClientHandler implements ClientHandler {
 	 */
 	@Override
 	public boolean send(ServerMessage m) {
-		if (!isActive) {
-			return false;
-		}
 		marshaller.write(m, writer);
 		isActive = false;
+		try {
+			close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

@@ -126,7 +126,42 @@ public class TestRemoteSpace {
 		assertTrue( flags[1] );
 		sr.closeGates();
 	}
-	
+
+	@Test
+	public void testConcurrentConn1() throws UnknownHostException, IOException, InterruptedException {
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate("tcp://127.0.0.1:9990/?conn");
+		Space aSpace = new SequentialSpace();
+		sr.add("target", aSpace);
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/target?conn");
+		boolean[] flags = new boolean[] { false , false };
+		Thread t1 = new Thread( () -> {
+			try {
+				rs.get(new ActualField(1));
+				flags[0] = true;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} );
+		t1.start();
+		Thread t2 = new Thread( () -> {
+			try {
+				rs.put(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			flags[1] = true;
+		} );
+		t2.start();
+		t1.join();
+		t2.join();
+		assertTrue( flags[0] );
+		assertTrue( flags[1] );
+		sr.closeGates();
+	}
+
 	//@Test
 	public void testCloseGate() {
 		String uri = "tcp://127.0.0.1:9994/?keep";

@@ -207,10 +207,9 @@ public class SpaceRepository {
 					}
 				}
 			} catch (IOException e) {
-			} finally {
 				try {
 					handler.close();
-				} catch (IOException e) {
+				} catch (IOException e2) {
 				}
 			} 
 			removeHandler(handler);

@@ -46,13 +46,7 @@ public class ConnClientGate implements ClientGate {
 	private final jSpaceMarshaller marshaller;
 	private String host;
 	private int port;
-	private Socket socket;
-	private BufferedReader reader;
-	private PrintWriter writer;
 	private String target;
-	private Boolean flag = false;
-	private IOException exception = null;
-	private ServerMessage result;
 
 	public ConnClientGate( jSpaceMarshaller marshaller , String host, int port, String target) {
 		this.marshaller = marshaller;
@@ -63,44 +57,9 @@ public class ConnClientGate implements ClientGate {
 	
 	@Override
 	public ServerMessage send(ClientMessage m) throws InterruptedException, UnknownHostException, IOException {
-		exception = null;
-		result = null;
-		socket = new Socket(host, port);
-		reader = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
-		writer = new PrintWriter(socket.getOutputStream());
-		m.setTarget(target);
-		marshaller.write(m, writer);
-		Thread rt = new Thread( new Runnable() {
-
-			@Override
-			public void run() {
-				synchronized (flag) {
-					try {
-						result = marshaller.read(ServerMessage.class, reader);
-						flag.notify();
-					} catch (IOException e) {
-						exception = e;
-						flag.notify();
-					}
-
-				}
-			}
-			
-		});
-		rt.start();
-		try {
-			synchronized (flag) {
-				while ((exception == null)&&(result == null)) {
-					flag.wait();
-				}
-			}
-			if (exception != null) {
-				throw exception;
-			}
-		} finally {
-			socket.close();
-		}
-		return result;
+		ConnInteractionHandler handler = new ConnInteractionHandler();
+		new Thread( () -> handler.send(m) ).start();
+		return handler.getResponce();
 	}
 
 	@Override
@@ -109,6 +68,51 @@ public class ConnClientGate implements ClientGate {
 
 	@Override
 	public void close() throws IOException {
+	}
+	
+	public class ConnInteractionHandler {
+		
+		private ServerMessage message;
+		private IOException exception;
+		private Socket socket;
+		private BufferedReader reader;
+		private PrintWriter writer;
+		
+		public ConnInteractionHandler( ) throws UnknownHostException, IOException {
+			socket = new Socket(host, port);
+			reader = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
+			writer = new PrintWriter(socket.getOutputStream());
+		}
+		
+		public void send( ClientMessage m ) {
+			m.setTarget(target);
+			marshaller.write(m, writer);
+			try {
+				setMessage(marshaller.read(ServerMessage.class, reader));
+			} catch (IOException e) {
+				setException(e);
+			}
+		}
+		
+		public synchronized void setMessage( ServerMessage message ) {
+			this.message = message;
+			notifyAll();
+		}
+		
+		public synchronized void setException( IOException exception ) {
+			this.exception = exception;
+			notifyAll();
+		}
+		
+		public synchronized ServerMessage getResponce( ) throws InterruptedException, IOException  {
+			while ((message == null)&&(exception==null)) {
+				wait();
+			}
+			if (exception != null) {
+				throw exception;
+			}
+			return message;
+		}
 	}
 
 }
