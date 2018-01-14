@@ -26,6 +26,7 @@ package org.jspace.gate;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -35,46 +36,24 @@ import org.jspace.io.jSpaceMarshaller;
  * @author loreti
  *
  */
-public class ConnServerGate implements ServerGate {
+public class ConnServerGate extends TcpServerGate implements ServerGate {
 	
-	private final jSpaceMarshaller marshaller;
 	private static final String CONN_CODE = "conn";
-	private final InetSocketAddress address;
-	private final int backlog;
-	private ServerSocket ssocket;
 	
 	public ConnServerGate(jSpaceMarshaller marshaller, InetSocketAddress address, int backlog) {
-		this.address = address;
-		this.backlog = backlog;
-		this.marshaller = marshaller;
+		super(marshaller,address,backlog);
+	}
+
+	@Override
+	protected ClientHandler getClientHandler(Socket socket) throws IOException {
+		return new ConnClientHandler(marshaller,socket);
+	}
+
+	@Override
+	protected String getConnectionCode() {
+		return CONN_CODE;
 	}
 	
 
-	@Override
-	public void open() throws IOException {
-		this.ssocket = new ServerSocket(address.getPort(), backlog, address.getAddress());
-	}
-
-	@Override
-	public ClientHandler accept() throws IOException {		
-		return new ConnClientHandler(marshaller,ssocket.accept());
-	}
-
-	@Override
-	public void close() throws IOException {
-		if (this.ssocket != null) {
-			this.ssocket.close();
-		}
-	}
-
-	@Override
-	public URI getURI() {
-		try {
-			return new URI("tcp:/"+address+"/"+"?"+CONN_CODE);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 }

@@ -46,18 +46,19 @@ public class TestRemoteSpace {
 	@Test
 	public void testKeepCreation() throws InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
-		sr.addGate("tcp://127.0.0.1:9900/?keep");
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
+		sr.closeGates();
 	}
 
 	@Test
 	public void testKeepUse() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
-		sr.addGate("tcp://127.0.0.1:9901/?keep");
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
-		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9901/target?keep");
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/target?keep");
 		rs.put(new Tuple(1,2,3).getTuple());
 		assertTrue(true);
 		Template template = new Template(1,2,3);
@@ -68,15 +69,16 @@ public class TestRemoteSpace {
 		aSpace.put(5,6,7);
 		assertNotNull(rs.get(new Template(5,6,7).getFields()));
 		assertNull(aSpace.getp(new Template(5,6,7).getFields()));
+		sr.closeGates();
 	}
 	
 	@Test
 	public void testConnUse() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
-		sr.addGate("tcp://127.0.0.1:9902/?conn");
+		sr.addGate("tcp://127.0.0.1:9990/?conn");
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
-		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9902/target?conn");
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/target?conn");
 		rs.put(1,2,3);
 		assertTrue(true);
 		Template template = new Template(1,2,3);
@@ -87,15 +89,16 @@ public class TestRemoteSpace {
 		aSpace.put(new Tuple(5,6,7).getTuple());
 		assertNotNull(rs.get(new Template(5,6,7).getFields()));
 		assertNull(aSpace.getp(new Template(5,6,7).getFields()));
+		sr.closeGates();
 	}	
 
 	@Test
 	public void testConcurrentKeep1() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
-		sr.addGate("tcp://127.0.0.1:9903/?keep");
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
-		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9902/target?conn");
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/target?keep");
 		boolean[] flags = new boolean[] { false , false };
 		Thread t1 = new Thread( () -> {
 			try {
@@ -107,23 +110,26 @@ public class TestRemoteSpace {
 			}
 		} );
 		t1.start();
-		Thread.sleep(1000);
 		Thread t2 = new Thread( () -> {
 			try {
-				rs.get(new ActualField(1));
-				flags[0] = true;
+				rs.put(1);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			flags[1] = true;
 		} );
 		t2.start();
-		
+		t1.join();
+		t2.join();
+		assertTrue( flags[0] );
+		assertTrue( flags[1] );
+		sr.closeGates();
 	}
 	
-	@Test
+	//@Test
 	public void testCloseGate() {
-		String uri = "tcp://127.0.0.1:9904/?keep";
+		String uri = "tcp://127.0.0.1:9994/?keep";
 		
 		SpaceRepository sr = new SpaceRepository();
 		sr.closeGate(uri);

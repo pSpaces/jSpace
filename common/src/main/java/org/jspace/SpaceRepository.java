@@ -24,6 +24,7 @@
 package org.jspace;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import org.jspace.gate.GateFactory;
 import org.jspace.gate.ServerGate;
 import org.jspace.protocol.ClientMessage;
 import org.jspace.protocol.ServerMessage;
+import org.jspace.protocol.pSpaceMessage;
 
 /**
  * A repository is a container for a group of spaces each of which is identified by a name.
@@ -108,24 +110,32 @@ public class SpaceRepository {
 		return spaces.remove(name);
 	}
 	
-	public void addGate( String uri ) {
-		this.addGate(URI.create(uri));
+	public boolean addGate( String uri ) {
+		return this.addGate(URI.create(uri));
 	}
 	
-	public void addGate( URI uri ) {
+	public boolean addGate( URI uri ) {
 		ServerGate gate = gateFactory.getGateBuilder(uri.getScheme()).createServerGate(uri);
-		this.addGate(gate);
+		return this.addGate(gate);
 	}
 	
-	public void addGate( ServerGate gate ) {
+	public synchronized boolean addGate( ServerGate gate ) {
+		try {
+			gate.open();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 		gates.add(gate);
 		executor.execute(() -> {
 			try {
-				gate.open();
-				while (true) {
+				while (!gate.isClosed()) {
 					ClientHandler handler = gate.accept();
-					addHandler( handler );
+					if (handler != null) {
+						addHandler( handler );
+					}
 				}
+			} catch (SocketException e) {
 			} catch (IOException e) {
 				e.printStackTrace();
 				try {
@@ -135,6 +145,7 @@ public class SpaceRepository {
 				}
 			}
 		});
+		return true;
 	}
 	
 	/**
@@ -182,26 +193,26 @@ public class SpaceRepository {
 	private synchronized void addHandler(ClientHandler handler) {
 		handlers.add(handler);
 		executor.execute(() -> {
-			while (handler.isActive()) {
-				ClientMessage message;
-				try {
-					message = handler.receive();
-					if (message != null) {
-						handler.send(handle(message));					
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					message = null;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					message = null;
-				}
-			}
 			try {
-				handler.close();
+				while (handler.isActive()) {
+					ClientMessage message = handler.receive();
+					if (message != null) {
+						executor.execute(() -> {
+							try {
+								handler.send(handle(message));
+							} catch (InterruptedException e) {
+								handler.send(ServerMessage.internalServerError());
+							}
+						});					
+					}
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			} finally {
+				try {
+					handler.close();
+				} catch (IOException e) {
+				}
+			} 
 			removeHandler(handler);
 		});
 	}
@@ -338,7 +349,7 @@ public class SpaceRepository {
 	}
 
 	
-	public void shutDown() {
+	public synchronized void shutDown() {
 		this.closeGates();
 		for (ClientHandler handler : handlers) {
 			try {

@@ -68,7 +68,7 @@ public class KeepClientHandler implements ClientHandler {
 	 */
 	@Override
 	public boolean send(ServerMessage m) {
-		if (!isActive) {
+		if (!isActive()) {
 			return false;
 		}
 		marshaller.write(m, writer);

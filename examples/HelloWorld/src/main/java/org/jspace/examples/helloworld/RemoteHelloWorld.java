@@ -60,6 +60,9 @@ public class RemoteHelloWorld {
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("T1 Error!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.out.println("T1 Error!");
 			}			
 		});		
 
@@ -72,6 +75,9 @@ public class RemoteHelloWorld {
 				e.printStackTrace();
 				System.out.println("T2 Error!");
 			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("T2 Error!");
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.out.println("T2 Error!");
 			}			

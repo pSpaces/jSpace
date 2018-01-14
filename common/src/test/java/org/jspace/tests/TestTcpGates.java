@@ -20,35 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
+package org.jspace.tests;
 
-package org.jspace.gate;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.UnknownHostException;
 
-import org.jspace.io.jSpaceMarshaller;
+import javax.swing.plaf.SliderUI;
 
-/**
- * @author loreti
- *
- */
-public class KeepServerGate extends TcpServerGate implements ServerGate {
+import org.jspace.ActualField;
+import org.jspace.RemoteSpace;
+import org.jspace.SequentialSpace;
+import org.jspace.Space;
+import org.jspace.SpaceRepository;
+import org.jspace.Template;
+import org.jspace.Tuple;
+import org.jspace.gate.KeepServerGate;
+import org.jspace.gate.ServerGate;
+import org.junit.Test;
 
-	private static final String KEEP_CODE = "keep";
+public class TestTcpGates {
 
-	public KeepServerGate(jSpaceMarshaller marshaller, InetSocketAddress address, int backlog) {
-		super(marshaller,address,backlog);
+		
+	@Test
+	public void testKeepCreation() throws IOException {
+		ServerGate sg = new KeepServerGate(null, new InetSocketAddress(9999), 10);
+		sg.open();
+		sg.close();
+		sg = new KeepServerGate(null, new InetSocketAddress(9999), 10);
+		sg.open();
+		sg.close();
+		assertTrue(true);
 	}
 
-	@Override
-	protected ClientHandler getClientHandler(Socket socket) throws IOException {
-		return new KeepClientHandler(marshaller,socket);
-	}
 
-	@Override
-	protected String getConnectionCode() {
-		return KEEP_CODE;
-	}
-
+	
 }

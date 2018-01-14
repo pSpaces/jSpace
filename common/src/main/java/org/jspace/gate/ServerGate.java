@@ -40,4 +40,6 @@ public interface ServerGate {
 	
 	public URI getURI();
 	
+	public boolean isClosed();
+	
 }

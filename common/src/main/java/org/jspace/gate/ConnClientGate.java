@@ -50,6 +50,9 @@ public class ConnClientGate implements ClientGate {
 	private BufferedReader reader;
 	private PrintWriter writer;
 	private String target;
+	private Boolean flag = false;
+	private IOException exception = null;
+	private ServerMessage result;
 
 	public ConnClientGate( jSpaceMarshaller marshaller , String host, int port, String target) {
 		this.marshaller = marshaller;
@@ -59,14 +62,44 @@ public class ConnClientGate implements ClientGate {
 	}
 	
 	@Override
-	public ServerMessage send(ClientMessage m) throws UnknownHostException, IOException {
+	public ServerMessage send(ClientMessage m) throws InterruptedException, UnknownHostException, IOException {
+		exception = null;
+		result = null;
 		socket = new Socket(host, port);
 		reader = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
 		writer = new PrintWriter(socket.getOutputStream());
 		m.setTarget(target);
 		marshaller.write(m, writer);
-		ServerMessage result = marshaller.read(ServerMessage.class, reader);
-		socket.close();
+		Thread rt = new Thread( new Runnable() {
+
+			@Override
+			public void run() {
+				synchronized (flag) {
+					try {
+						result = marshaller.read(ServerMessage.class, reader);
+						flag.notify();
+					} catch (IOException e) {
+						exception = e;
+						flag.notify();
+					}
+
+				}
+			}
+			
+		});
+		rt.start();
+		try {
+			synchronized (flag) {
+				while ((exception == null)&&(result == null)) {
+					flag.wait();
+				}
+			}
+			if (exception != null) {
+				throw exception;
+			}
+		} finally {
+			socket.close();
+		}
 		return result;
 	}
 

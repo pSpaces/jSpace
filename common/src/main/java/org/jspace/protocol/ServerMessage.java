@@ -252,8 +252,6 @@ public class ServerMessage {
 				null,//clientSession, 
 				null //serverSession
 			);
-	}
-
-	
+	}	
 	
 }

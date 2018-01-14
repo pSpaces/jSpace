@@ -121,12 +121,14 @@ public class KeepClientGate implements ClientGate {
 		try {
 			while (true) {
 				ServerMessage m = marshaller.read(ServerMessage.class, reader);
-				String session = m.getClientSession();
-				if ((session != null)&&(inbox.canSet(session))) {
-					inbox.set(session, m);
-				} else {
-					//TODO: Add Log!
-					System.err.println("Unexpected session id!");
+				if (m != null) {
+					String session = m.getClientSession();
+					if ((session != null)&&(inbox.canSet(session))) {
+						inbox.set(session, m);
+					} else {
+						//TODO: Add Log!
+						System.err.println("Unexpected session id!");
+					}
 				}
 			}
 		} catch (IOException e) {
