@@ -45,6 +45,7 @@ public class KeepClientHandler implements ClientHandler {
 	private BufferedReader reader;
 	private PrintWriter writer;
 	private boolean isActive = true;
+	private boolean isClosed = false;
 
 	public KeepClientHandler(jSpaceMarshaller marshaller, Socket client) throws IOException {
 		this.marshaller = marshaller;
@@ -86,7 +87,14 @@ public class KeepClientHandler implements ClientHandler {
 	@Override
 	public void close() throws IOException {
 		client.close();
+		isClosed = true;
 		isActive = false;
 	}
 
+	@Override
+	public boolean isClosed() {
+		return isClosed;
+	}
+
+	
 }

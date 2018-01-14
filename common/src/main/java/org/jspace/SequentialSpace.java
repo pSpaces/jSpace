@@ -63,7 +63,7 @@ public class SequentialSpace implements Space {
 		return true;
 	}
 	
-	protected void addTuple(Tuple tuple) {
+	protected synchronized void addTuple(Tuple tuple) {
 		tuples.add(tuple);
 	}
 	
@@ -83,7 +83,7 @@ public class SequentialSpace implements Space {
 		}
 	}
 	
-	protected Tuple findTuple(Template template,boolean toRemove) {
+	protected synchronized Tuple findTuple(Template template,boolean toRemove) {
 		Iterator<Tuple> tuplesIterator = tuples.iterator();
 		while (tuplesIterator.hasNext()) {
 			Tuple t = tuplesIterator.next();
@@ -97,7 +97,7 @@ public class SequentialSpace implements Space {
 		return null;
 	}
 
-	protected LinkedList<Object[]> findAllTuples(Template template,boolean toRemove) {
+	protected synchronized LinkedList<Object[]> findAllTuples(Template template,boolean toRemove) {
 		LinkedList<Object[]> result = new LinkedList<Object[]>();
 		Iterator<Tuple> tuplesIterator = tuples.iterator();
 		Tuple t;

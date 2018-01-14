@@ -20,27 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-
 package org.jspace.gate;
 
-import java.io.IOException;
-
-import org.jspace.protocol.ClientMessage;
-import org.jspace.protocol.ServerMessage;
-
 /**
+ * @author loreti
  *
  */
-public interface ClientHandler {
-	
-	public ClientMessage receive( ) throws IOException;
-	
-	public boolean send( ServerMessage m );
-	
-	public boolean isActive();
+public interface ExceptionLogger {
 
-	public void close() throws IOException;
-
-	public boolean isClosed();
-
+	public void logException( Exception e ); 
+	
 }

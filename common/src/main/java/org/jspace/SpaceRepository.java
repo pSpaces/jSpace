@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jspace.gate.ClientHandler;
+import org.jspace.gate.ExceptionLogger;
 import org.jspace.gate.GateFactory;
 import org.jspace.gate.ServerGate;
 import org.jspace.protocol.ClientMessage;
@@ -50,6 +51,7 @@ public class SpaceRepository {
 	private GateFactory gateFactory;
 	private LinkedList<ServerGate> gates = new LinkedList<>();
 	private LinkedList<ClientHandler> handlers = new LinkedList<>();
+	private ExceptionLogger logger = null;
 	
 	/**
 	 * Creates a new respository.
@@ -123,7 +125,7 @@ public class SpaceRepository {
 		try {
 			gate.open();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logException(e);
 			return false;
 		}
 		gates.add(gate);
@@ -136,12 +138,13 @@ public class SpaceRepository {
 					}
 				}
 			} catch (SocketException e) {
+				logException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logException(e);
 				try {
 					gate.close();
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					logException(e1);
 				}
 			}
 		});
@@ -171,7 +174,7 @@ public class SpaceRepository {
 							this.gates.remove(g);
 							g.close();
 						} catch (IOException e) {
-							e.printStackTrace();
+							logException(e);
 						}
 					});
 	}
@@ -185,7 +188,7 @@ public class SpaceRepository {
 			try {
 				gate.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logException(e);
 			}
 		}
 	}
@@ -207,9 +210,13 @@ public class SpaceRepository {
 					}
 				}
 			} catch (IOException e) {
+				logException(e);
 				try {
-					handler.close();
+					if (!handler.isClosed()) {
+						handler.close();
+					}
 				} catch (IOException e2) {
+					logException(e2);
 				}
 			} 
 			removeHandler(handler);
@@ -341,7 +348,7 @@ public class SpaceRepository {
 			try {
 				g.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logException(e);
 			}
 		}
 		this.gates = new LinkedList<>();
@@ -352,13 +359,25 @@ public class SpaceRepository {
 		this.closeGates();
 		for (ClientHandler handler : handlers) {
 			try {
-				handler.close();
+				if (!handler.isClosed()) {
+					handler.close();
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logException(e);
 			}
 		}
+		this.handlers = new LinkedList<>();
 		this.executor.shutdownNow();
 	}
 	
+	
+	private void logException( Exception e ) {
+		if (logger != null) {
+			logger.logException(e);
+		}
+	}
 
+	public void setExceptionLogger( ExceptionLogger logger ) {
+		this.logger = logger;
+	}
 }
