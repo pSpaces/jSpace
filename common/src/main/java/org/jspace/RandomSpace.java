@@ -23,8 +23,6 @@
 
 package org.jspace;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 public class RandomSpace extends SequentialSpace {
@@ -52,6 +50,28 @@ public class RandomSpace extends SequentialSpace {
 		this.random = r;
 	}
 	
+	// New version: does not provide uniform distribution on matching tuples but is more performant
+	protected Tuple findTuple(Template template,boolean toRemove) {
+		Tuple t;
+		int j, startI;
+		for (int i = 0; i < tuples.size(); i++) {
+			// randomise starting index
+			startI =  random.nextInt(tuples.size());
+			j = (startI+i)%tuples.size();
+			t = tuples.get((startI+i)%tuples.size());
+			if (template.match(t)) {
+				if (toRemove) {
+					tuples.remove(j);
+				}
+				return t;
+			}
+		}
+		return null;
+		
+	}
+	
+	// Previous version: less performant but provides uniform choice on the set of matching tuples
+	/*
 	protected Tuple findTuple(Template template,boolean toRemove) {
 		ArrayList<Tuple> data = new ArrayList<>();
 		Iterator<Tuple> tuplesIterator = tuples.iterator();
@@ -70,5 +90,6 @@ public class RandomSpace extends SequentialSpace {
 		}
 		return t;
 	}
+	*/
 	
 }
