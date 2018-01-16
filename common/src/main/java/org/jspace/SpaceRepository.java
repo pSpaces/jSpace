@@ -292,7 +292,9 @@ public class SpaceRepository {
 		} else {
 			t = space.getp(template.getFields());
 		}
-		result.add(t);
+		if (t != null) {
+		    result.add(t);
+		}
 		return result;
 	}
 
@@ -311,7 +313,9 @@ public class SpaceRepository {
 		} else {
 			t = space.queryp(template.getFields());
 		}
-		result.add(t);
+		if (t != null) {
+			result.add(t);
+		}
 		return result;
 	}
 
