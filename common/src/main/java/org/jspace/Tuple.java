@@ -146,7 +146,7 @@ public final class Tuple implements Iterable<Object>, Serializable {
 
 			@Override
 			public boolean hasNext() {
-				return fields != null && current < fields.length;
+				return current < fields.length;
 			}
 
 			@Override
