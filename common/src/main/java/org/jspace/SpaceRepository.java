@@ -294,7 +294,7 @@ public class SpaceRepository {
 		}
 		if (t != null) {
 		    result.add(t);
-        }
+		}
 		return result;
 	}
 
