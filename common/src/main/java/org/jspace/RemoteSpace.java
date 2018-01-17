@@ -134,11 +134,14 @@ public class RemoteSpace implements Space {
 		} catch (IOException e) {
 			throw new InterruptedException(e.getMessage());
 		} 
-		List<Object[]> tuples = response.getTuples();
-		if (tuples.size()==0) {
-			return null;
+		if (response.isSuccessful()) {
+			List<Object[]> tuples = response.getTuples();
+			if (tuples.size()==0) {
+				return null;
+			}
+			return tuples.get(0);
 		}
-		return tuples.get(0);
+		return null;
 	}
 
 	@Override

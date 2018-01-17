@@ -194,16 +194,29 @@ public class ServerMessage {
 	}
 
 	public static ServerMessage putResponse(boolean status, String clientSession) {
-		return new ServerMessage(
-			ServerMessageType.PUT_RESPONSE,// messageType, 
-			null, //interactionMode, 
-			status, //status 
-			ServerMessage.CODE200, //statusCode, 
-			ServerMessage.OK_STATUS, //statusMessage, 
-			null,//tuples, 
-			clientSession,//clientSession, 
-			null //serverSession
-		);
+		if (status) {
+			return new ServerMessage(
+					ServerMessageType.PUT_RESPONSE,// messageType, 
+					null, //interactionMode, 
+					status, //status 
+					ServerMessage.CODE200, //statusCode, 
+					ServerMessage.OK_STATUS, //statusMessage, 
+					null,//tuples, 
+					clientSession,//clientSession, 
+					null //serverSession
+				);
+		} else {
+			return new ServerMessage(
+					ServerMessageType.PUT_RESPONSE,// messageType, 
+					null, //interactionMode, 
+					status, //status 
+					ServerMessage.CODE400, //statusCode, 
+					ServerMessage.BAD_REQUEST, //statusMessage, 
+					null,//tuples, 
+					clientSession,//clientSession, 
+					null //serverSession
+					);
+		}
 	}
 
 	public static ServerMessage getResponse(List<Object[]> tuples, String clientSession) {

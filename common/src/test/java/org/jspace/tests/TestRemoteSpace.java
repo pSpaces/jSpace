@@ -22,6 +22,7 @@
  *******************************************************************************/
 package org.jspace.tests;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -71,7 +72,53 @@ public class TestRemoteSpace {
 		assertNull(aSpace.getp(new Template(5,6,7).getFields()));
 		sr.closeGates();
 	}
-	
+
+	@Test
+	public void testKeepPutWrongSpace() throws UnknownHostException, IOException, InterruptedException {
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
+		Space aSpace = new SequentialSpace();
+		sr.add("target", aSpace);
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/another?keep");
+		assertFalse(rs.put(new Tuple(1,2,3).getTuple()));
+		sr.closeGates();
+	}
+
+	@Test
+	public void testKeepPutWrongMethod() throws UnknownHostException, IOException, InterruptedException {
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
+		Space aSpace = new SequentialSpace();
+		sr.add("target", aSpace);
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/target?conn");
+		assertFalse(rs.put(new Tuple(1,2,3).getTuple()));
+		assertFalse(rs.put(new Tuple(1,2,3).getTuple()));
+		sr.closeGates();
+	}
+
+	@Test
+	public void testKeepGetWrongSpace() throws UnknownHostException, IOException, InterruptedException {
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
+		Space aSpace = new SequentialSpace();
+		sr.add("target", aSpace);
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/another?keep");
+		assertNull(rs.get(new ActualField(1)));
+		sr.closeGates();
+	}
+
+	@Test
+	public void testKeepQueryWrongSpace() throws UnknownHostException, IOException, InterruptedException {
+		SpaceRepository sr = new SpaceRepository();
+		sr.addGate("tcp://127.0.0.1:9990/?keep");
+		Space aSpace = new SequentialSpace();
+		sr.add("target", aSpace);
+		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/another?keep");
+		assertNull(rs.query(new ActualField(1)));
+		sr.closeGates();
+	}
+
+
 	@Test
 	public void testConnUse() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
