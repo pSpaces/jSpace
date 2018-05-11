@@ -23,18 +23,15 @@
 
 package org.jspace.gate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import org.jspace.io.jSpaceMarshaller;
 import org.jspace.protocol.ClientMessage;
 import org.jspace.protocol.ServerMessage;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * @author loreti
@@ -47,8 +44,8 @@ public class ConnClientGate implements ClientGate {
 	private String host;
 	private int port;
 	private Socket socket;
-	private BufferedReader reader;
-	private PrintWriter writer;
+	private InputStream reader;
+	private OutputStream writer;
 	private String target;
 
 	public ConnClientGate( jSpaceMarshaller marshaller , String host, int port, String target) {
@@ -61,8 +58,8 @@ public class ConnClientGate implements ClientGate {
 	@Override
 	public ServerMessage send(ClientMessage m) throws UnknownHostException, IOException {
 		socket = new Socket(host, port);
-		reader = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
-		writer = new PrintWriter(socket.getOutputStream());
+		reader = socket.getInputStream();
+		writer = socket.getOutputStream();
 		m.setTarget(target);
 		marshaller.write(m, writer);
 		ServerMessage result = marshaller.read(ServerMessage.class, reader);

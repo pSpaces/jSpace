@@ -23,20 +23,17 @@
 
 package org.jspace.gate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.LinkedList;
-
 import org.jspace.io.jSpaceMarshaller;
 import org.jspace.protocol.ClientMessage;
 import org.jspace.protocol.ServerMessage;
 import org.jspace.util.Rendezvous;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 /**
  * @author loreti
@@ -49,8 +46,8 @@ public class KeepClientGate implements ClientGate {
 	private String host;
 	private int port;
 	private Socket socket;
-	private BufferedReader reader;
-	private PrintWriter writer;
+	private InputStream reader;
+	private OutputStream writer;
 	private String target;
 	private final Rendezvous<String, ServerMessage> inbox;
 	private final LinkedList<ClientMessage> outbox;
@@ -81,8 +78,8 @@ public class KeepClientGate implements ClientGate {
 	@Override
 	public void open() throws UnknownHostException, IOException {
 		this.socket = new Socket(host, port);
-		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		this.writer = new PrintWriter(socket.getOutputStream());
+		this.reader = socket.getInputStream();
+		this.writer = socket.getOutputStream();
 		new Thread( () -> outboxHandlingMethod() ).start();
 		new Thread( () -> inboxHandlingMethod() ).start();
 	}

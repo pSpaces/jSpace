@@ -23,15 +23,14 @@
 
 package org.jspace.gate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 import org.jspace.io.jSpaceMarshaller;
 import org.jspace.protocol.ClientMessage;
 import org.jspace.protocol.ServerMessage;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * @author loreti
@@ -41,15 +40,15 @@ public class ConnClientHandler implements ClientHandler {
 
 	private jSpaceMarshaller marshaller;
 	private Socket client;
-	private BufferedReader reader;
-	private PrintWriter writer;
+	private InputStream reader;
+	private OutputStream writer;
 	private boolean isActive = true;
 
 	public ConnClientHandler(jSpaceMarshaller marshaller, Socket client) throws IOException {
 		this.marshaller = marshaller;
 		this.client = client;
-		this.reader = new BufferedReader(new InputStreamReader( client.getInputStream() ));
-		this.writer = new PrintWriter( client.getOutputStream() );
+		this.reader = client.getInputStream();
+		this.writer = client.getOutputStream();
 	}
 
 	/* (non-Javadoc)

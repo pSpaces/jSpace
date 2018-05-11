@@ -23,9 +23,9 @@
 
 package org.jspace.io;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author loreti
@@ -37,8 +37,8 @@ public interface jSpaceMarshaller {
 	
 	public <T> T fromByte(Class<T> clazz, byte[] data);
 
-	public <T> T read(Class<T> clazz, BufferedReader reader) throws IOException;
+	public <T> T read(Class<T> clazz, InputStream input) throws IOException;
 
-	public void write(Object o, PrintWriter writer);
+	public void write(Object o, OutputStream output);
 
 }
