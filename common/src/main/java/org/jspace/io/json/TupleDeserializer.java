@@ -37,10 +37,9 @@ import com.google.gson.JsonParseException;
  * (see {@link JsonDeserializer}).
  */
 public class TupleDeserializer implements JsonDeserializer<Tuple> {
-
 	@Override
-	public Tuple deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
+	public Tuple deserialize(JsonElement json, Type typeOfT,
+            JsonDeserializationContext context) throws JsonParseException {
 		if (!json.isJsonArray()) {
 			throw new JsonParseException("Unexpected JsonElement!");
 		}
@@ -52,5 +51,4 @@ public class TupleDeserializer implements JsonDeserializer<Tuple> {
 		}
 		return new Tuple(data);
 	}
-
 }

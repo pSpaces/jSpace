@@ -34,28 +34,29 @@ import org.jspace.io.MarshalFactory;
  *
  */
 public class GateFactory {
-	
+
 	public final static String LANGUAGE_QUERY_ELEMENT = "lang";
 	public final static String MODE_QUERY_ELEMENT = "mode";
-	
-	public final static String TCP_PROTOCOL = "tcp";			
-	public final static String UDP_PROTOCOL = "udp";			
-	public final static String HTTP_PROTOCOL = "http";			
-	public final static String HTTPS_PROTOCOL = "https";
-	private static GateFactory instance;				
-	
-	private HashMap<String,GateBuilder> gateBuilders; 
-	
+
+	public final static String TLS_PROTOCOL = "tls"; // default
+	public final static String TCP_PROTOCOL = "tcp";
+
+	private static GateFactory instance;
+
+	private HashMap<String,GateBuilder> gateBuilders;
+
 	private GateFactory( ) {
 		this.gateBuilders = new HashMap<>();
 		init();
 	}
 
 	private void init() {
-		this.gateBuilders.put(TCP_PROTOCOL, new TcpGateBuilder());
-		this.gateBuilders.put(UDP_PROTOCOL, new UdpGateBuilder());
+        // FIXME use register instead of manual labor
+        GateBuilder tcp = new TcpGateBuilder();
+        register(TCP_PROTOCOL, tcp);
+        register(TLS_PROTOCOL, tcp);
 	}
-	
+
 	public static HashMap<String,String> parseQuery(String query) {
 		String[] elements = query.split("&");
 		HashMap<String,String> values = new HashMap<>();
@@ -67,7 +68,7 @@ public class GateFactory {
 				values.put(pair[0], "");
 			}
 		}
-		return values;		
+		return values;
 	}
 
 	public static GateFactory getInstance() {
@@ -80,7 +81,7 @@ public class GateFactory {
 	public GateBuilder getGateBuilder(String scheme) {
 		return gateBuilders.get(scheme);
 	}
-	
+
 	public void register( String scheme, GateBuilder builder) {
 		gateBuilders.put(scheme, builder);
 	}

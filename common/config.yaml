@@ -1,0 +1,13 @@
+protocol: tls
+address: 127.0.0.1
+port: 7001
+server_key: SomeExampleServerKey
+marshaller: json
+verbosity: 2
+encryption:
+    algorithm: aes
+    key: SomeCoolEncryptionKey
+tls:
+    keyStorePath: myKeyStore.jks
+    keyStorePassword: password
+    trustStorePath: myTrustStore.jks

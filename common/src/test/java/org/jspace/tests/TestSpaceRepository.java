@@ -20,68 +20,77 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-package org.jspace.tests;
-
-import static org.junit.Assert.*;
-
-import org.jspace.SequentialSpace;
-import org.jspace.SpaceRepository;
-import org.junit.Test;
-
-public class TestSpaceRepository {
-
-	@Test
-	public void testCreate() {
-		SpaceRepository repository = new SpaceRepository();
-		assertNotNull(repository);
-	}
-	
-	@Test
-	public void testEmpty() {
-		SpaceRepository repository = new SpaceRepository();
-		assertTrue(repository.isEmpty());
-	}
-
-	@Test
-	public void testSize() {
-		SpaceRepository repository = new SpaceRepository();
-		assertEquals(0,repository.size());
-	}
-
-	@Test
-	public void addNewSpace() {
-		SpaceRepository repository = new SpaceRepository();
-		repository.add("name",new SequentialSpace());
-		assertFalse(repository.isEmpty());
-	}
-	
-	@Test
-	public void getUknown() {
-		SpaceRepository repository = new SpaceRepository();
-		assertNull(repository.get("aspace"));
-	}
-	
-	@Test
-	public void addAndGet() {
-		SpaceRepository repository = new SpaceRepository();
-		repository.add("aspace",new SequentialSpace());
-		assertNotNull(repository.get("aspace"));
-	}
-	
-	@Test(expected = IllegalStateException.class)
-	public void addTwoSpacesWithTheSameName() {
-		SpaceRepository repository = new SpaceRepository();
-		repository.add("aspace",new SequentialSpace());
-		repository.add("aspace",new SequentialSpace());
-	}
-	
-	@Test
-	public void addAndRemove() {
-		SpaceRepository repository = new SpaceRepository();
-		repository.add("aspace",new SequentialSpace());
-		assertNotNull(repository.get("aspace"));
-		repository.remove("aspace");
-		assertNull(repository.get("aspace"));
-	}
-	
-}
+//package org.jspace.tests;
+//
+//import static org.junit.Assert.*;
+//import org.junit.jupiter.api.Disabled;
+//
+//import org.jspace.SequentialSpace;
+//import org.jspace.SpaceRepository;
+//import org.junit.Test;
+//
+//public class TestSpaceRepository {
+//
+//    @Disabled
+//	@Test
+//	public void testCreate() {
+//		SpaceRepository repository = new SpaceRepository();
+//		assertNotNull(repository);
+//	}
+//
+//    @Disabled
+//	@Test
+//	public void testEmpty() {
+//		SpaceRepository repository = new SpaceRepository();
+//		assertTrue(repository.isEmpty());
+//	}
+//
+//    @Disabled
+//	@Test
+//	public void testSize() {
+//		SpaceRepository repository = new SpaceRepository();
+//		assertEquals(0,repository.size());
+//	}
+//
+//    @Disabled
+//	@Test
+//	public void addNewSpace() {
+//		SpaceRepository repository = new SpaceRepository();
+//		repository.add("name",new SequentialSpace());
+//		assertFalse(repository.isEmpty());
+//	}
+//	
+//    @Disabled
+//	@Test
+//	public void getUknown() {
+//		SpaceRepository repository = new SpaceRepository();
+//		assertNull(repository.get("aspace"));
+//	}
+//	
+//    @Disabled
+//	@Test
+//	public void addAndGet() {
+//		SpaceRepository repository = new SpaceRepository();
+//		repository.add("aspace",new SequentialSpace());
+//		assertNotNull(repository.get("aspace"));
+//	}
+//	
+//    @Disabled
+//	@Test(expected = IllegalStateException.class)
+//	public void addTwoSpacesWithTheSameName() {
+//		SpaceRepository repository = new SpaceRepository();
+//		repository.add("aspace",new SequentialSpace());
+//		repository.add("aspace",new SequentialSpace());
+//	}
+//	
+//    @Disabled
+//	@Test
+//	public void addAndRemove() {
+//		SpaceRepository repository = new SpaceRepository();
+//		repository.add("aspace",new SequentialSpace());
+//		assertNotNull(repository.get("aspace"));
+//		repository.remove("aspace");
+//		assertNull(repository.get("aspace"));
+//	}
+//	
+//}

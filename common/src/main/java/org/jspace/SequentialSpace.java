@@ -199,5 +199,18 @@ public class SequentialSpace implements Space {
 	public synchronized int size() {
 		return tuples.size();
 	}
-	
+
+    public LinkedList<Tuple> toListOfTuples() {
+        return tuples;
+    }
+
+    public String toString() {
+        String s = "";
+
+        for (Tuple t : tuples) {
+            s = String.join(", ", s, t.toString());
+        }
+
+        return s;
+    }
 }

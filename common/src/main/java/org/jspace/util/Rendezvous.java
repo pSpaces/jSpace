@@ -64,6 +64,7 @@ public class Rendezvous<T,V> {
 		DataWrapper wrapper;
 		synchronized (data) {
 			wrapper = data.get(tag);
+
 			if (wrapper != null) {
 				if (!wrapper.flag) {
 					throw new IllegalStateException("Duplicated call on tag: "+tag);

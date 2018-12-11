@@ -76,6 +76,7 @@ public class ClassDictionary {
 		classToUri.put(Template.class, TEMPLATE_URI);
 	}
 	
+	/* FIXME deal with var clazz */
 	public void register(String uri, Class<?> clazz) {
 		if (uriToClass.containsKey(uri)) {
 			throw new IllegalArgumentException("Duplicated uri!");

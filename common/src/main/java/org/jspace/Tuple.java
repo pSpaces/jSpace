@@ -74,8 +74,8 @@ public final class Tuple implements Iterable<Object>, Serializable {
 	}
 
 	/**
-	 * Returns the class <code>c</code> of the element with index <code>i</code>
-	 * .
+	 * Returns the class <code>c</code> of the element with index
+     * <code>i</code>.
 	 * 
 	 * @param i
 	 *            element index

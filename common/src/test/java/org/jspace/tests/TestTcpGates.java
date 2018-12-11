@@ -30,10 +30,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import javax.swing.plaf.SliderUI;
-
 import org.jspace.ActualField;
-import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.jspace.SpaceRepository;
@@ -41,22 +38,25 @@ import org.jspace.Template;
 import org.jspace.Tuple;
 import org.jspace.gate.KeepServerGate;
 import org.jspace.gate.ServerGate;
+//import org.jspace.protocol.ServerMessage;
+import org.jspace.protocol.ManagementMessage;
+
+
 import org.junit.Test;
 
 public class TestTcpGates {
-
-		
 	@Test
 	public void testKeepCreation() throws IOException {
-		ServerGate sg = new KeepServerGate(null, new InetSocketAddress(9999), 10);
+		ServerGate sg = new KeepServerGate(null, new InetSocketAddress(9999),
+//                10, ServerMessage.class);
+                10, ManagementMessage.class);
 		sg.open();
 		sg.close();
-		sg = new KeepServerGate(null, new InetSocketAddress(9999), 10);
+		sg = new KeepServerGate(null, new InetSocketAddress(9999), 10,
+//                ServerMessage.class);
+                  ManagementMessage.class);
 		sg.open();
 		sg.close();
 		assertTrue(true);
 	}
-
-
-	
 }

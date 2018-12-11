@@ -25,17 +25,16 @@ package org.jspace.gate;
 
 import java.io.IOException;
 
-import org.jspace.protocol.ClientMessage;
-import org.jspace.protocol.ServerMessage;
+import org.jspace.protocol.Message;
 
 /**
  *
  */
 public interface ClientHandler {
 	
-	public ClientMessage receive( ) throws IOException;
+	public Message receive( ) throws IOException;
 	
-	public boolean send( ServerMessage m );
+	public boolean send(Message m);
 	
 	public boolean isActive();
 

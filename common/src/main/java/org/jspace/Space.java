@@ -23,9 +23,7 @@
 
 package org.jspace;
 
-
 import java.util.List;
-
 
 /**
  * A space is a concurrent data structure that can be used to coordinate activities of threads. 
@@ -50,7 +48,7 @@ public interface Space {
 	 * the action is executed.
 	 */
 	public boolean put(Object ... fields)  throws InterruptedException;
-	
+
 	/**
 	 * Retrieves (and remove) a tuple matching the requested template. A template is rendered as
 	 * an array of {@link TemplateField}. The returned, say <code>result</code> will satisfy
@@ -97,7 +95,7 @@ public interface Space {
 	 * the action is executed.
 	 */
 	public List<Object[]> getAll(TemplateField ... fields) throws InterruptedException;
-	
+
 	/**
 	 * Reads (without removing) a tuple matching the requested template. A template is rendered as
 	 * an array of {@link TemplateField}. The returned, say <code>result</code> will satisfy
@@ -115,7 +113,7 @@ public interface Space {
 	 * the action is executed.
 	 */
 	public Object[] query(TemplateField ... fields) throws InterruptedException;
-	
+
 	/**
 	 * Reads (without removing) a tuple matching the requested template. A template is rendered as
 	 * an array of {@link TemplateField}. The returned, say <code>result</code> will satisfy
@@ -133,7 +131,7 @@ public interface Space {
 	 * the action is executed.
 	 */
 	public Object[] queryp(TemplateField ... fields) throws InterruptedException;
-	
+
 	/**
 	 * Reads (without removing) all the tuples matching the requested template. A template is rendered as
 	 * an array of {@link TemplateField}. The returned, say <code>result</code> will satisfy
@@ -150,9 +148,12 @@ public interface Space {
 	 */
 	public List<Object[]> queryAll(TemplateField ... fields) throws InterruptedException;
 
+    public String toString();
+    public List<Tuple> toListOfTuples();
+
 //  TODO: The following methods will be included in future implementations.
 //	public Space map(Function<Tuple, Tuple> f) throws InterruptedException;
-//	
+//
 //	public <T1> T1 reduce(BiFunction<Tuple, T1, T1> f, Comparator<Tuple> comp, T1 v) throws InterruptedException;
-	
+
 }

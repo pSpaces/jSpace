@@ -40,16 +40,15 @@ import com.google.gson.JsonSerializer;
  *
  */
 public class TemplateSerializer implements JsonSerializer<Template> {
-
 	@Override
 	public JsonElement serialize(Template src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonArray toReturn = new JsonArray();
 		jSonUtils utils = jSonUtils.getInstance();
+
 		for (TemplateField f : src) {
 			toReturn.add(utils.jsonFromTeplate(f, context));
 		}
+
 		return toReturn;
 	}
-	
-	
 }

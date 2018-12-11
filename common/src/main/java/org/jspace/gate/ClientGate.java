@@ -26,8 +26,7 @@ package org.jspace.gate;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import org.jspace.protocol.ClientMessage;
-import org.jspace.protocol.ServerMessage;
+import org.jspace.protocol.Message;
 
 /**
  * This interface 
@@ -35,9 +34,6 @@ import org.jspace.protocol.ServerMessage;
 public interface ClientGate {
 	
 	public void open() throws UnknownHostException, IOException;
-	
-	public ServerMessage send( ClientMessage m ) throws UnknownHostException, IOException, InterruptedException;
-	
+	public Message send(Message m) throws UnknownHostException, IOException, InterruptedException;
 	public void close() throws IOException;
-
 }

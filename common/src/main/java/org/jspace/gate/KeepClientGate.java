@@ -23,66 +23,80 @@
 
 package org.jspace.gate;
 
-import java.io.BufferedReader;
+import org.jspace.io.jSpaceMarshaller;
+import org.jspace.protocol.Message;
+import org.jspace.protocol.ManagementMessage;
+import org.jspace.util.Rendezvous;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetSocketAddress;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.net.ssl.SSLSocketFactory;
 import java.util.LinkedList;
-
-import org.jspace.io.jSpaceMarshaller;
-import org.jspace.protocol.ClientMessage;
-import org.jspace.protocol.ServerMessage;
-import org.jspace.util.Rendezvous;
 
 /**
  * @author loreti
  *
  */
 public class KeepClientGate implements ClientGate {
-	
-	
-	private final jSpaceMarshaller marshaller;
-	private String host;
-	private int port;
-	private Socket socket;
-	private BufferedReader reader;
-	private PrintWriter writer;
-	private String target;
-	private final Rendezvous<String, ServerMessage> inbox;
-	private final LinkedList<ClientMessage> outbox;
-	private boolean status = true;
-	private int sessionCounter = 0;
 
-	public KeepClientGate( jSpaceMarshaller marshaller , String host, int port, String target) {
+	private final jSpaceMarshaller marshaller;
+	protected String host;
+	protected  int port;
+	private Socket socket;
+	private InputStream reader;
+	private OutputStream writer;
+	private String target;
+	private final Rendezvous<String, Message> inbox;
+	private final LinkedList<Message> outbox;
+	private boolean status = true;
+    private int sessionCounter = 0;
+    private Class messageClass;
+    private SSLSocketFactory sf;
+
+	public KeepClientGate(jSpaceMarshaller marshaller , String host, int port,
+            String target, Class messageClass) {
 		this.marshaller = marshaller;
 		this.host = host;
 		this.port = port;
 		this.target = target;
 		this.inbox = new Rendezvous<>();
 		this.outbox = new LinkedList<>();
+        this.messageClass = messageClass;
+        this.sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 	}
-	
+
 	@Override
-	public ServerMessage send(ClientMessage m) throws IOException, InterruptedException {
+	public Message send(Message m) throws IOException, InterruptedException {
 		String sessionId = ""+(sessionCounter++);
 		m.setTarget(target);
-		m.setClientSession(sessionId);
+		m.setSession(sessionId);
 		synchronized (outbox) {
 			outbox.add(m);
 			outbox.notify();
 		}
+
 		return inbox.call(sessionId);
 	}
 
+    protected Socket createSocket() throws UnknownHostException, IOException {
+        System.out.println("Created a new TCP socket");
+        return new Socket(host, port);
+    }
+
 	@Override
 	public void open() throws UnknownHostException, IOException {
-		this.socket = new Socket(host, port);
-		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		this.writer = new PrintWriter(socket.getOutputStream());
+        if (enableTLS()) {
+            System.out.println("Creating a TLS socket");
+            this.socket = sf.createSocket(host, port);
+        } else {
+            System.out.println("Creating a TCP socket");
+            this.socket = new Socket(host, port);
+        }
+		this.reader = socket.getInputStream();
+		this.writer = socket.getOutputStream();
 		new Thread( () -> outboxHandlingMethod() ).start();
 		new Thread( () -> inboxHandlingMethod() ).start();
 	}
@@ -114,21 +128,23 @@ public class KeepClientGate implements ClientGate {
 		} catch (InterruptedException e) {
 			// TODO Add Log!
 			e.printStackTrace();
-		} 
+		}
 	}
 	
 	private void inboxHandlingMethod() {
 		try {
 			while (true) {
-				ServerMessage m = marshaller.read(ServerMessage.class, reader);
+				Message m = (Message) marshaller.read(messageClass, reader);
 				if (m != null) {
-					String session = m.getClientSession();
-					if ((session != null)&&(inbox.canSet(session))) {
+					//String session = m.getClientSession();
+					String session = m.getSession();
+					if ((session != null) && (inbox.canSet(session))) {
 						inbox.set(session, m);
 					} else {
 						//TODO: Add Log!
-						System.err.println("Unexpected session id!");
+						System.err.println("GATE Unexpected session id!");
 					}
+				} else {
 				}
 			}
 		} catch (IOException e) {
@@ -137,4 +153,7 @@ public class KeepClientGate implements ClientGate {
 		}
 	}
 
+    private boolean enableTLS() {
+        return true;
+    }
 }

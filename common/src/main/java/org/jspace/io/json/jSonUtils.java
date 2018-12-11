@@ -33,6 +33,7 @@ import org.jspace.Template;
 import org.jspace.TemplateField;
 import org.jspace.Tuple;
 import org.jspace.io.ClassDictionary;
+import org.jspace.protocol.DataProperties;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -49,7 +50,7 @@ import com.google.gson.JsonSerializer;
  *
  */
 public class jSonUtils {
-	
+
 	/**
 	 * Json tag indicating if a template field is a formal or an actual.
 	 */
@@ -66,24 +67,27 @@ public class jSonUtils {
 	 */
 	public static final String VALUE_ID = "value";
 
-	
+
 	private static jSonUtils instance;
-	
+
 	private final GsonBuilder builder;
-	
+
+	/* FIXME typo dicionary */
 	private final ClassDictionary dicionary;
-	
+
 	private jSonUtils() {
 		this.builder = new GsonBuilder();
 		this.dicionary = new ClassDictionary();
 		init();
 	}
-	
+
 	private void init() {
 		builder.registerTypeAdapter(Tuple.class, new TupleSerializer());
 		builder.registerTypeAdapter(Tuple.class, new TupleDeserializer());
 		builder.registerTypeAdapter(Template.class, new TemplateSerializer());
 		builder.registerTypeAdapter(Template.class, new TemplateDeserializer());
+	//	builder.registerTypeAdapter(DataProperties.class, new DataPropertiesSerializer());
+		builder.registerTypeAdapter(DataProperties.class, new DataPropertiesDeserializer());
 	}
 
 	public static jSonUtils getInstance() {
@@ -92,23 +96,28 @@ public class jSonUtils {
 		}
 		return instance;
 	}
-	
+
 	public String toString(Object o) {
-		Gson gson = builder.create();		
-		return gson.toJson(o);
+		Gson gson = builder.create();
+        String json = gson.toJson(o);
+		return json;
 	}
-	
+
 	public byte[] toByte(Object o) {
 		return toString(o).getBytes();
 	}
 
+	/* FIXME clazz */
 	public <T> T fromByte(Class<T> clazz, byte[] data) {
 		return fromString(clazz, new String(data));
 	}
 
 	public <T> T fromString(Class<T> clazz, String message) {
-		Gson gson = builder.create();		
-		return gson.fromJson(message, clazz);
+        if (message != null) {
+            Gson gson = builder.create();
+            return gson.fromJson(message, clazz);
+        }
+        return null;
 	}
 
 	public void write( PrintWriter w, Object o ) {
@@ -116,13 +125,18 @@ public class jSonUtils {
 		w.println(message);
 		w.flush();
 	}
-	
+
 	public <T> T read( BufferedReader r, Class<T> clazz ) throws IOException {
 		String message = r.readLine();
+        System.out.println("READ MESSAGE " + message);
+        if (message == null) {
+            throw new IOException("READ MESSAGE: String was empty");
+        }
+
 		return fromString( clazz , message );
 	}
-	
-	
+
+
 	/**
 	 * Serialize an object into a {@link JsonElement}. The object is rendered as
 	 * a {@link JsonObject} containing two attributes:
@@ -148,6 +162,8 @@ public class jSonUtils {
 		JsonObject json = new JsonObject();
 		json.add(jSonUtils.TYPE_ID, new JsonPrimitive(dicionary.getURI(o.getClass())));
 		json.add(jSonUtils.VALUE_ID, context.serialize(o));
+
+
 		return json;
 	}
 
@@ -184,48 +200,51 @@ public class jSonUtils {
 			throw new JsonParseException(e);
 		}
 	}
-	
-	
+
+
 	public JsonElement jsonFromTeplate( TemplateField field, JsonSerializationContext context ) {
+        Gson gson = builder.create();
 		if (field instanceof ActualField) {
 			ActualField af = (ActualField) field;
-			JsonObject json = new JsonObject();
-			json.add(jSonUtils.FORMAL_ID, new JsonPrimitive(false));
-			json.add(jSonUtils.VALUE_ID, jsonFromObject(af.getValue(), context));
-			return json;
+			return jsonFromObject(af.getValue(), context);
 		} else {
 			FormalField ff = (FormalField) field;
 			JsonObject json = new JsonObject();
-			json.add(jSonUtils.FORMAL_ID, new JsonPrimitive(true));
-			json.add(jSonUtils.VALUE_ID, new JsonPrimitive(dicionary.getURI(ff.getFormalFieldType())));
+			//json.add(jSonUtils.FORMAL_ID, new JsonPrimitive(true));
+			json.add(jSonUtils.TYPE_ID, new JsonPrimitive(dicionary.getURI(ff.getFormalFieldType())));
 			return json;
 		}
 	}
-	
+
 	public TemplateField templateFromJSon( JsonElement json, JsonDeserializationContext context ) {
+
 		if (!json.isJsonObject()) {
 			throw new JsonParseException("Unexpected JsonElement!");
 		}
+
 		JsonObject jo = (JsonObject) json;
-		if ((!jo.has(jSonUtils.FORMAL_ID)) || (!jo.has(jSonUtils.VALUE_ID))) {
+
+		if (!jo.has("type")) {
 			throw new JsonParseException("Required attributes are not available!");
 		}
-		boolean isFormal = jo.get(FORMAL_ID).getAsBoolean();
-		if (isFormal) {
+
+        if (!jo.has("value")) { // is formal field
 			try {
-				return new FormalField(dicionary.getClass(jo.get(VALUE_ID).getAsString()));
+                FormalField toReturn = new FormalField(dicionary.getClass(jo.get("type").getAsString()));
+                return toReturn;
 			} catch (ClassNotFoundException e) {
 				throw new JsonParseException(e);
 			}
-		} else {
-			return new ActualField(objectFromJson(jo.get(VALUE_ID), context));
-		}
-	}	
-	
+		} else { // is actual field
+            ActualField f = new ActualField(objectFromJson(jo, context));
+            return f;
+        }
+	}
+
 	public void register( String uri , Class<?> clazz ) {
 		this.register(uri, clazz,null,null);
 	}
-	
+
 	public <T> void register( String uri , Class<T> clazz , JsonSerializer<T> serializer , JsonDeserializer<T> deserializer ) {
 		this.dicionary.register(uri, clazz);
 		if (serializer != null) {
@@ -240,5 +259,7 @@ public class jSonUtils {
 		return builder.create();
 	}
 
-
+	public Gson getPrettyGson() {
+		return builder.setPrettyPrinting().create();
+	}
 }

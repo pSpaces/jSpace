@@ -23,16 +23,14 @@
 
 package org.jspace.gate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 import org.jspace.io.jSpaceMarshaller;
-import org.jspace.protocol.ClientMessage;
-import org.jspace.protocol.ServerMessage;
+import org.jspace.protocol.Message;
+import org.jspace.protocol.ManagementMessage;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * @author loreti
@@ -42,25 +40,30 @@ public class KeepClientHandler implements ClientHandler {
 
 	private jSpaceMarshaller marshaller;
 	private Socket client;
-	private BufferedReader reader;
-	private PrintWriter writer;
+	private InputStream reader;
+	private OutputStream writer;
 	private boolean isActive = true;
 	private boolean isClosed = false;
+    private Class messageClass;
 
-	public KeepClientHandler(jSpaceMarshaller marshaller, Socket client) throws IOException {
+	public KeepClientHandler(jSpaceMarshaller marshaller, Socket client,
+            Class messageClass) throws IOException {
 		this.marshaller = marshaller;
 		this.client = client;
-		this.reader = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
-		this.writer = new PrintWriter( client.getOutputStream() );
+		this.reader = client.getInputStream();
+		this.writer = client.getOutputStream();
+        this.messageClass = messageClass;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.jspace.gate.ClientHandler#receive()
 	 */
 	@Override
-	public ClientMessage receive() throws IOException {
-		ClientMessage message = marshaller.read(ClientMessage.class, reader);
+	public Message receive() throws IOException {
+		Message message = (Message) marshaller.read(messageClass, reader);
+        System.out.println("<<< Request : " + message);
 		isActive  = (message != null);
+
 		return message;
 	}
 
@@ -68,7 +71,8 @@ public class KeepClientHandler implements ClientHandler {
 	 * @see org.jspace.gate.ClientHandler#send(org.jspace.protocol.ServerMessage)
 	 */
 	@Override
-	public boolean send(ServerMessage m) {
+	public boolean send(Message m) {
+        System.out.println(">>> Response: " + m);
 		if (!isActive()) {
 			return false;
 		}
@@ -95,6 +99,4 @@ public class KeepClientHandler implements ClientHandler {
 	public boolean isClosed() {
 		return isClosed;
 	}
-
-	
 }

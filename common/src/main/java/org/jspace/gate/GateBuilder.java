@@ -30,9 +30,6 @@ import java.net.URI;
  *
  */
 public interface GateBuilder {
-
-	public ClientGate createClientGate(URI uri);
-	
-	public ServerGate createServerGate(URI uri);
-	
+	public ClientGate createClientGate(URI uri, Class messageClass);
+	public ServerGate createServerGate(URI uri, Class messageClass);
 }

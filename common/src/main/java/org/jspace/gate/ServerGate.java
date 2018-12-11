@@ -31,15 +31,10 @@ import java.net.URI;
  *
  */
 public interface ServerGate {
-
-	public void open( ) throws IOException;
-	
-	public ClientHandler accept( ) throws IOException;
-	
-	public void close( ) throws IOException;
-	
+	public void open() throws IOException;
+	public ClientHandler accept() throws IOException;
+	public void close() throws IOException;
 	public URI getURI();
-	
 	public boolean isClosed();
-	
+    public int getPort();
 }

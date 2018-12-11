@@ -23,14 +23,9 @@
 
 package org.jspace.io;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
-
-import org.jspace.io.jSpaceMarshaller;
 import org.jspace.io.json.jSonUtils;
+
+import java.io.*;
 
 
 /**
@@ -49,12 +44,12 @@ public class JSonMarshaller implements jSpaceMarshaller {
 		return utils.fromByte(clazz, data);
 	}
 	
-	public <T> T read(Class<T> clazz, BufferedReader reader) throws IOException {
-		return utils.read(reader, clazz);
+	public <T> T read(Class<T> clazz, InputStream reader) throws IOException {
+		return utils.read(new BufferedReader(new InputStreamReader(reader)), clazz);
 	}
 
-	public void write(Object o, PrintWriter writer) {
-		utils.write(writer,o);
+	public void write(Object o, OutputStream writer) {
+		utils.write(new PrintWriter(new OutputStreamWriter(writer)),o);
 	}
 
 }

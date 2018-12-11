@@ -37,13 +37,14 @@ public class KeepServerGate extends TcpServerGate implements ServerGate {
 
 	private static final String KEEP_CODE = "keep";
 
-	public KeepServerGate(jSpaceMarshaller marshaller, InetSocketAddress address, int backlog) {
-		super(marshaller,address,backlog);
+	public KeepServerGate(jSpaceMarshaller marshaller,
+            InetSocketAddress address, int backlog, Class messageClass) {
+		super(marshaller, address, backlog, messageClass);
 	}
 
 	@Override
 	protected ClientHandler getClientHandler(Socket socket) throws IOException {
-		return new KeepClientHandler(marshaller,socket);
+		return new KeepClientHandler(marshaller, socket, messageClass);
 	}
 
 	@Override
