@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import org.jspace.SpaceWrapper;
 
 import org.jspace.config.ServerConfig;
-
+import org.jspace.monitor.RepositoryMonitor;
 import org.jspace.protocol.Message;
 import org.jspace.protocol.MessageType;
 import org.jspace.protocol.Status;
@@ -22,21 +22,27 @@ import org.jspace.protocol.DataProperties;
  */
 
 public class Repository extends Server {
-    private final String name;
+    protected final String name;
     private ManagementServer mgmt; // management server
+    private RepositoryMonitor monitor;
+   
 
     // spaces maps space names to references
-    private final HashMap<String, SpaceWrapper> spaces = new HashMap<String, SpaceWrapper>();
+    protected final HashMap<String, SpaceWrapper> spaces = new HashMap<String, SpaceWrapper>();
+    protected final HashMap<String, MonitoredRepository> monitors = new HashMap<String,MonitoredRepository>();
+	private final String key;
 
     public Repository(String name, String key) {
         super(new ServerConfig(0, key), pSpaceMessage.class); // param '0' listens to a random port
         this.name = name;
+        this.key = key;
         init();
     }
 
     private void init() {
         this.mgmt = ManagementServer.getInstance();
-    }
+     
+     }
 
     protected Message handle(Message message) throws InterruptedException {
         switch (message.getOperation()) {
@@ -60,7 +66,7 @@ public class Repository extends Server {
         }
     }
 
-    private pSpaceMessage generateFailureMsg(pSpaceMessage message) {
+    protected pSpaceMessage generateFailureMsg(pSpaceMessage message) {
         return new pSpaceMessage(
             MessageType.FAILURE, //MessageType op,
             message.getSession(), //String session,
@@ -85,13 +91,19 @@ public class Repository extends Server {
 
         SpaceWrapper sw = spaces.get(target.getName());
         Space space = sw.getSpace();
-
-        List<Tuple> tuples = sw.getSpace().toListOfTuples();
+        SpaceProperties props= sw.getProperties();
 
         if (space != null) {
             Tuple tuple = message.getTuple();
-            spaces.get(target.getName()).getSpace().put(message.getTuple().getTuple());
-            Tuple tuplll = tuples.get(0);
+            
+            //se la classe è monitorata,le azioni passano attraverso il suo monitor
+            if(this.isMonitored()) {
+            	monitors.get(this.getName()).getMonitor().put( sw, message.getTuple().getTuple());
+            }
+            else {
+            	 spaces.get(target.getName()).getSpace().put(message.getTuple().getTuple());
+            }
+           
 
             return new pSpaceMessage(
                 MessageType.ACK, //MessageType op,
@@ -105,7 +117,18 @@ public class Repository extends Server {
         }
     }
 
-    public pSpaceMessage handleGetRequest(pSpaceMessage message)
+    private boolean isMonitored() {
+		
+    	
+    	if(monitors.get(this.getName()) != null) {
+	    	if(monitors.get(this.getName()).getMonitor() != null) {
+	    		return true;
+	    	}
+    	}
+    	return false;
+	}
+
+	public pSpaceMessage handleGetRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
         //String key = message.getTarget().getKeys().getGetKey();
@@ -119,12 +142,21 @@ public class Repository extends Server {
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
         // TODO insert template
+        SpaceWrapper sw = spaces.get(target.getName());
         Space space = spaces.get(target.getName()).getSpace();
         Template t = message.getTemplate();
         List<Tuple> tuples = space.toListOfTuples();
-        Tuple tuple = new Tuple(space.get(t.getFields()));
-
-
+        Tuple tuple = null;
+        
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuple = new Tuple(monitor.get(sw ,t.getFields()));
+			
+        }
+        else {
+        	tuple = new Tuple(space.get(t.getFields()));
+        }
+        
         pSpaceMessage response = new pSpaceMessage(
             MessageType.GET, //MessageType op,
             message.getSession(), //String session,
@@ -140,6 +172,7 @@ public class Repository extends Server {
     public pSpaceMessage handleGetPRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
+        SpaceWrapper sw = spaces.get(target.getName());
         //String key = message.getTarget().getKeys().getGetKey();
 
         // validate key
@@ -150,8 +183,19 @@ public class Repository extends Server {
 
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
-        // TODO insert template
-        spaces.get(target.getName()).getSpace().getp(message.getTemplate().getFields());
+        Template t = message.getTemplate();
+        
+        Tuple tuple = null;
+        
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuple = new Tuple(monitor.getp(sw ,t.getFields()));
+			
+        }
+        else {
+        	//rimasto come era prima, manca il template
+        	spaces.get(target.getName()).getSpace().getp(null);
+        }
 
         pSpaceMessage response = new pSpaceMessage(
             MessageType.GETP, //MessageType op,
@@ -168,6 +212,7 @@ public class Repository extends Server {
     public pSpaceMessage handleGetAllRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
+        SpaceWrapper sw = spaces.get(target.getName());
         //String key = message.getTarget().getKeys().getGetKey();
 
         // validate key
@@ -178,9 +223,21 @@ public class Repository extends Server {
 
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
-        // TODO insert template
-        spaces.get(target.getName()).getSpace().getAll(message.getTemplate().getFields());
-
+        
+        // get all restituisce una lista, in questa funzione non era implementato 
+        //abbiamo creato una lista
+        List<Object[]> tuples = null;
+        Template t = message.getTemplate();
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuples = monitor.getAll(sw ,t.getFields());
+			
+        }
+        else {
+        	// lasciato come era prima, manca il valore di ritorno da passare al response
+        	spaces.get(target.getName()).getSpace().getAll(message.getTemplate().getFields());
+        }
+        
         pSpaceMessage response = new pSpaceMessage(
             MessageType.GETALL, //MessageType op,
             message.getSession(), //String session,
@@ -196,6 +253,7 @@ public class Repository extends Server {
     public pSpaceMessage handleQueryRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
+        SpaceWrapper sw = spaces.get(target.getName());
         //String key = message.getTarget().getKeys().getQueryKey();
 
         // validate key
@@ -206,8 +264,21 @@ public class Repository extends Server {
 
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
-        // TODO insert template
-        Tuple tuple = new Tuple(spaces.get(target.getName()).getSpace().query(message.getTemplate().getFields()));
+        Template t = message.getTemplate();
+        Tuple tuple = null;
+        Space space = spaces.get(target.getName()).getSpace();
+        
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuple = new Tuple(monitor.query(sw ,t.getFields()));
+			
+        }
+        else {
+        	//funziona come prima, ma abbiamo ridotto il codice
+        	tuple = new Tuple(space.query(t.getFields()));
+        }
+        // commentato il codice precedente
+        //Tuple tuple = new Tuple(spaces.get(target.getName()).getSpace().query(message.getTemplate().getFields()));
 
         pSpaceMessage response = new pSpaceMessage(
             MessageType.QUERY, //MessageType op,
@@ -223,6 +294,7 @@ public class Repository extends Server {
     public pSpaceMessage handleQueryPRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
+        SpaceWrapper sw = spaces.get(target.getName());
 //        String key = message.getTarget().getKeys().getQueryKey();
 
         // validate key
@@ -234,7 +306,19 @@ public class Repository extends Server {
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
         // TODO insert template
-        spaces.get(target.getName()).getSpace().queryp(message.getTemplate().getFields());
+        Template t = message.getTemplate();
+        Tuple tuple = null;
+        Space space = spaces.get(target.getName()).getSpace();
+        
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuple = new Tuple(monitor.queryp(sw ,t.getFields()));
+			
+        }
+        else {
+        	spaces.get(target.getName()).getSpace().queryp(null);
+        }
+       
 
         pSpaceMessage response = new pSpaceMessage(
             MessageType.QUERYP, //MessageType op,
@@ -251,6 +335,7 @@ public class Repository extends Server {
     public pSpaceMessage handleQueryAllRequest(pSpaceMessage message)
         throws InterruptedException {
         SpaceProperties target = message.getTarget();
+        SpaceWrapper sw = spaces.get(target.getName());
 //        String key = message.getTarget().getKeys().getQueryKey();
 
         // validate key
@@ -261,8 +346,17 @@ public class Repository extends Server {
 
         // handle the request
         message.getTarget().setKeys(null); // clear keys from the response
-        // TODO insert template
-        spaces.get(target.getName()).getSpace().queryAll(message.getTemplate().getFields());
+        Template t = message.getTemplate();
+        List<Object[]> tuples = null;
+        if(this.isMonitored()) {
+        	monitor = monitors.get(this.getName()).getMonitor();
+        	tuples = monitor.queryAll(sw ,t.getFields());
+			
+        }
+        else {
+        	spaces.get(target.getName()).getSpace().queryAll(message.getTemplate().getFields());
+        }
+        
 
         pSpaceMessage response = new pSpaceMessage(
             MessageType.QUERYALL, //MessageType op,
@@ -343,4 +437,8 @@ public class Repository extends Server {
     public SpaceWrapper getSpace(String name) {
         return spaces.get(name);
     }
+
+	public String getKey() {
+		return key;
+	}
 }

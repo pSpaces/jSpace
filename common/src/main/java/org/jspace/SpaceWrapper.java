@@ -10,7 +10,7 @@ public class SpaceWrapper {
     private Space space;
     private SpaceProperties properties;
 
-    SpaceWrapper(Space space, SpaceProperties properties) {
+    public SpaceWrapper(Space space, SpaceProperties properties) {
         this.space = space;
         this.properties = properties;
     }

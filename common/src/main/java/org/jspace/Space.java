@@ -24,6 +24,12 @@
 package org.jspace;
 
 import java.util.List;
+import java.util.function.Predicate;
+
+
+import org.jspace.monitor.ActionType;
+import org.jspace.monitor.SpaceMeasurement;
+import org.jspace.monitor.SpaceListener;
 
 /**
  * A space is a concurrent data structure that can be used to coordinate activities of threads. 
@@ -77,6 +83,7 @@ public interface Space {
 	 * </ul>
 	 * 
 	 * If a tuple matching the requested tempalte is not found, <code>null</code> is returned.
+	 * @param p 
 	 * 
 	 * @param fields an array of template fields representing a template 
 	 * @return a tuple matching the template or <code>null</code> if no tuple matches the template
@@ -124,6 +131,7 @@ public interface Space {
 	 * </ul>
 	 * 
 	 * Value <code>null</code> is returned if no matching tuple is found.
+	 * @param p 
 	 * 
 	 * @param fields an array of template fields representing the requested template 
 	 * @return a list containing all the tuples matching the template
@@ -150,6 +158,40 @@ public interface Space {
 
     public String toString();
     public List<Tuple> toListOfTuples();
+
+	public Object[] get(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] query(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] get(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] query(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] getp(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] queryp(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] getp(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public Object[] queryp(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+	
+    public boolean lock() throws InterruptedException;	
+
+    public boolean unlock() throws InterruptedException;	
+    
+    public boolean addListener( SpaceListener listener );
+    
+    public boolean removeListener( SpaceListener listener );
+    
+    public <T> boolean registerMeasure( SpaceMeasurement<T> measure );
+
+	public List<Object[]> getAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	public List<Object[]> queryAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
+	boolean registerEvent();
+
+//	public ActionHandler checkHandler(ActionType put);
 
 //  TODO: The following methods will be included in future implementations.
 //	public Space map(Function<Tuple, Tuple> f) throws InterruptedException;
