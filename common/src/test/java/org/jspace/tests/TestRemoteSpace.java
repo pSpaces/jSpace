@@ -84,7 +84,7 @@ public class TestRemoteSpace {
 		sr.closeGates();
 	}
 
-	7*
+	/*
 	@Test
 	public void testKeepPutWrongMethod() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
