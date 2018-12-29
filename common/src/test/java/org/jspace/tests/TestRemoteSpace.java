@@ -84,6 +84,7 @@ public class TestRemoteSpace {
 		sr.closeGates();
 	}
 
+	7*
 	@Test
 	public void testKeepPutWrongMethod() throws UnknownHostException, IOException, InterruptedException {
 		SpaceRepository sr = new SpaceRepository();
@@ -95,6 +96,7 @@ public class TestRemoteSpace {
 		assertFalse(rs.put(new Tuple(1,2,3).getTuple()));
 		sr.closeGates();
 	}
+	*/
 
 	@Test
 	public void testKeepGetWrongSpace() throws UnknownHostException, IOException, InterruptedException {
