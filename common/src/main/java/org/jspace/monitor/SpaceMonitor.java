@@ -1,29 +1,26 @@
 package org.jspace.monitor;
 
-import java.util.LinkedList;
+
 import java.util.List;
 import java.util.function.Predicate;
 
 import org.jspace.Space;
 import org.jspace.TemplateField;
 
+
 public class SpaceMonitor {
 	
 	private Rule rule;
-	private LinkedList<Rule> rules;
+	
 	
 	public SpaceMonitor(Rule rule) {
 		this.rule = rule;
 	}
-	
-	public SpaceMonitor(LinkedList<Rule> rules) {
-		this.rules = rules;
-	}
 
 	public boolean put(Space space, Object[] fields) throws InterruptedException {
-		  
-		RuleEvaluation<Boolean> re = rule.put(space, fields);
 		
+		RuleEvaluation<Boolean> re = rule.put(space, fields);
+		this.rule = re.getRule();
 		return re.getValue();
 	
 	}
@@ -35,17 +32,20 @@ public class SpaceMonitor {
 				if(re.getValue()==null) {
 					wait();
 				}
+				this.rule = re.getRule();
 				return re.getValue();
 		}
 	}
 
 	public Object[] getp(Space space, TemplateField[] fields) throws InterruptedException {
 		  RuleEvaluation<Object[]> re = rule.getp(space,fields);
+		  this.rule = re.getRule();
 		  return re.getValue();
 	}
 
 	public List<Object[]> getAll(Space space, TemplateField[] fields)throws InterruptedException {
 		  RuleEvaluation<List<Object[]>> re = rule.getAll(space,fields);
+		  this.rule = re.getRule();
 		  return re.getValue();
 	}
 
@@ -55,17 +55,20 @@ public class SpaceMonitor {
 			if(re.getValue()==null) {
 				wait();
 			}
+			this.rule = re.getRule();
 			return re.getValue();
 		}
 	}
 
 	public Object[] queryp(Space space, TemplateField[] fields) throws InterruptedException {
 		 RuleEvaluation<Object[]> re = rule.queryp(space,fields);
+		 this.rule = re.getRule();
 		 return re.getValue();
 	}
 
 	public List<Object[]> queryAll(Space space, TemplateField[] fields) throws InterruptedException {
 		  RuleEvaluation<List<Object[]>> re = rule.queryAll(space,fields);
+		  this.rule = re.getRule();
 		  return re.getValue();
 	}
 
@@ -76,6 +79,7 @@ public class SpaceMonitor {
 			if(re.getValue()==null) {
 				wait();
 			}
+			this.rule = re.getRule();
 			return re.getValue();
 		}
 	}
@@ -86,6 +90,7 @@ public class SpaceMonitor {
 			if(re.getValue()==null) {
 				wait();
 			}
+			this.rule = re.getRule();
 			return re.getValue();
 		}
 	}
@@ -97,6 +102,7 @@ public class SpaceMonitor {
 			if(re.getValue()==null) {
 				wait();
 			}
+			this.rule = re.getRule();
 			return re.getValue();
 		}
 	}
@@ -107,50 +113,59 @@ public class SpaceMonitor {
 			if(re.getValue()==null) {
 				wait();
 			}
+			this.rule = re.getRule();
 			return re.getValue();
 		}
 	}
 
 	public Object[] getp(Space space, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		RuleEvaluation<Object[]> re = rule.getp(space,p,fields);
+		this.rule = re.getRule();
 		return re.getValue();
 	}
 
 	public Object[] queryp(Space space, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		RuleEvaluation<Object[]> re = rule.queryp(space,p,fields);
+		this.rule = re.getRule();
 		return re.getValue();
 	}
 
 	public Object[] getp(Space space, Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		RuleEvaluation<Object[]> re = rule.getp(space,spaceCondition,p,fields);
+		this.rule = re.getRule();
 		return re.getValue();
 	}
 
 	public Object[] queryp(Space space, Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		RuleEvaluation<Object[]> re = rule.queryp(space,spaceCondition,p,fields);
+		this.rule = re.getRule();
 		return re.getValue();
 	}
 
 	public List<Object[]> getAll(Space space, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		 RuleEvaluation<List<Object[]>> re = rule.getAll(space,p,fields);
+		 this.rule = re.getRule();
 		 return re.getValue();
 	}
 
 	public List<Object[]> queryAll(Space space, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
 		 RuleEvaluation<List<Object[]>> re = rule.queryAll(space,p,fields);
+		 this.rule = re.getRule();
 		 return re.getValue();
 	}
 
 	public List<Object[]> queryAll(Space space, Predicate<Space> spaceCondition, Predicate<Object[]> p,
 			TemplateField[] fields) throws InterruptedException {
 		RuleEvaluation<List<Object[]>> re = rule.queryAll(space,spaceCondition,p,fields);
-		 return re.getValue();
+		this.rule = re.getRule();
+		return re.getValue();
 	}
 
 	public List<Object[]> getAll(Space space, Predicate<Space> spaceCondition, Predicate<Object[]> p,
 			TemplateField[] fields)throws InterruptedException {
 		RuleEvaluation<List<Object[]>> re = rule.getAll(space,spaceCondition,p,fields);
-		 return re.getValue();
+		this.rule = re.getRule();
+		return re.getValue();
 	}
 
 	

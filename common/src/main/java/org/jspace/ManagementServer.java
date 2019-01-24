@@ -155,7 +155,7 @@ public class ManagementServer extends Server {
     }
 
     // create a space FIXME not message passing, method called by Repository
-    private Message handleCreateSpace(ManagementMessage in) {
+    private Message handleCreateSpace(ManagementMessage in) throws InterruptedException {
         RepositoryProperties repo = in.getRepository();
         // authorized? (Repository Manager requires _ANY_ repo key)
         if (repo != null && !keys.contains(repo.getKey())) {
@@ -184,52 +184,18 @@ public class ManagementServer extends Server {
                 // repository is good, check for space existence and create a
                 // new space if  needed
                 SpaceProperties props = in.getSpace();
-                SpaceWrapper existingSpace = repository.getSpace(props.getName());
+                //ManagementServer handle the request of newSpace, but delegate the creation 
+                //to repository
+                SpaceWrapper space = repository.newSpace( props.getName(), props);
 
-                if (existingSpace == null) {
-                    // create new space
-                    props.setUUID(UUID.randomUUID().toString());
-                    SpaceWrapper space = null;
-
-                    switch (props.getType()) {
-                        case PILE:
-                            space = new SpaceWrapper(new PileSpace(), props);
-                        case QUEUE:
-                            space = new SpaceWrapper(new QueueSpace(), props);
-                        case RANDOM:
-                            space = new SpaceWrapper(new RandomSpace(), props);
-                        case SEQUENTIAL:
-                            space = new SpaceWrapper(new SequentialSpace(), props);
-                        case STACK:
-                            space = new SpaceWrapper(new StackSpace(), props);
-                        default:
-                            break;
-                            // FIXME below return statement does not work but is
-                            // necessary :(
-                            //        return ManagementMessage.badRequest(in.getSession(),
-                            //            "Malformed message: unknown space type");
-                    }
-
-                    spaces.put(props.getUUID(), space);
-                    repositories.get(in.getRepository().getName()).addSpace(space);
-
-                    return new ManagementMessage(
-                            MessageType.CREATE_SPACE,
-                            "", // serverkey
-                            new RepositoryProperties(
-                                in.getRepository().getName(),
-                                null),
-                            new SpaceProperties(
-                                props.getType(),
-                                props.getName(),
-                                props.getUUID(),
-                                null),
-                            new Status(200, "OK"),
-                            in.getSession()); // status
+                if (space == null) {
+                    return ManagementMessage.badRequest(in.getSession(),
+                            "Not authorized: operation is not permitted!");
                 }
+                
+                props = space.getProperties();
+            
 
-                // space did exist, return its properties
-                props = existingSpace.getProperties();
                 return new ManagementMessage(
                         MessageType.CREATE_SPACE,
                         "", // serverkey

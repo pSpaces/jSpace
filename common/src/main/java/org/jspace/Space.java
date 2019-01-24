@@ -23,13 +23,12 @@
 
 package org.jspace;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
 
 import org.jspace.monitor.ActionType;
-import org.jspace.monitor.SpaceMeasurement;
-import org.jspace.monitor.SpaceListener;
 
 /**
  * A space is a concurrent data structure that can be used to coordinate activities of threads. 
@@ -158,7 +157,12 @@ public interface Space {
 
     public String toString();
     public List<Tuple> toListOfTuples();
-
+    
+    //new method to check conditions on the Space
+    //param: 
+    //Predicate<Object[]> p -> action predicate
+    //Predicate<Space> spaceCondition -> condition of the space
+    
 	public Object[] get(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
 
 	public Object[] query(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
@@ -189,9 +193,10 @@ public interface Space {
 
 	public List<Object[]> queryAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
 
-	boolean registerEvent();
+	public List<Object[]> getAll(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
 
-//	public ActionHandler checkHandler(ActionType put);
+	public List<Object[]> queryAll(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException;
+
 
 //  TODO: The following methods will be included in future implementations.
 //	public Space map(Function<Tuple, Tuple> f) throws InterruptedException;

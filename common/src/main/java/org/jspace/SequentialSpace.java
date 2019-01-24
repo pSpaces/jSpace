@@ -31,11 +31,6 @@ import java.util.function.Predicate;
 
 
 import org.jspace.monitor.ActionType;
-import org.jspace.monitor.MeasureListener;
-import org.jspace.monitor.SpaceEvent;
-import org.jspace.monitor.SpaceEventListener;
-import org.jspace.monitor.SpaceMeasurement;
-import org.jspace.monitor.SpaceListener;
 
 public class SequentialSpace implements Space {
 	
@@ -73,7 +68,9 @@ public class SequentialSpace implements Space {
 		}
 		addTuple(new Tuple(Arrays.copyOf(fields, fields.length)));
 		notifyAll();
-		notifySpaceEvent(new SpaceEvent(ActionType.PUT,Arrays.copyOf(fields, fields.length)));
+		LinkedList<Tuple> addTuples = null;
+		addTuples.add(new Tuple(Arrays.copyOf(fields, fields.length)));
+		notifySpaceEvent(new SpaceEvent(ActionType.PUT,addTuples));
 		return true;
 	}
 	
@@ -91,7 +88,9 @@ public class SequentialSpace implements Space {
 			Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),true);
 			if (result != null) {
 				notifyAll();
-				notifySpaceEvent(new SpaceEvent(ActionType.GET,result.getTuple()));
+				LinkedList<Tuple> removedTuples = null;
+				removedTuples.add(result);
+				notifySpaceEvent(new SpaceEvent(ActionType.GET,removedTuples));
 				return result.getTuple();
 			}
 			wait(); 
@@ -146,7 +145,9 @@ public class SequentialSpace implements Space {
 		Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),true);
 		if (result != null) {
 			notifyAll();
-			notifySpaceEvent(new SpaceEvent(ActionType.GET,result.getTuple())); 
+			LinkedList<Tuple> removedTuples = null;
+			removedTuples.add(result);
+			notifySpaceEvent(new SpaceEvent(ActionType.GET,removedTuples)); 
 			return result.getTuple();
 		}
 		return null;
@@ -163,7 +164,7 @@ public class SequentialSpace implements Space {
 		LinkedList<Object[]> result = findAllTuples(new Template(Arrays.copyOf(fields,fields.length)),true);
 		if (result.size()>0) {
 			notifyAll();
-			notifySpaceEvent(new SpaceEvent(ActionType.GETALL,result));
+			//notifySpaceEvent(new SpaceEvent(ActionType.GETALL,result));
 		}
 		return result;
 	}
@@ -177,7 +178,9 @@ public class SequentialSpace implements Space {
 		while(true){
 			Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),false);
 			if (result != null) {
-				notifySpaceEvent(new SpaceEvent(ActionType.QUERY,result.getTuple()));
+				LinkedList<Tuple> readTuples = null;
+				readTuples.add(result);
+				notifySpaceEvent(new SpaceEvent(ActionType.QUERY,readTuples));
 				return result.getTuple();
 			}
 			wait();
@@ -191,7 +194,9 @@ public class SequentialSpace implements Space {
 	@Override
 	public synchronized Object[] queryp(TemplateField ... fields){
 		Tuple result = findTuple(new Template(Arrays.copyOf(fields,fields.length)),false);
-		notifySpaceEvent(new SpaceEvent(ActionType.QUERY,result.getTuple()));
+		LinkedList<Tuple> readTuples = null;
+		readTuples.add(result);
+		notifySpaceEvent(new SpaceEvent(ActionType.QUERY,readTuples));
 		return (result==null?null:result.getTuple());
 	}
 
@@ -305,7 +310,11 @@ public class SequentialSpace implements Space {
 		while(true){
 			Tuple result = findTuple(p,new Template(Arrays.copyOf(fields,fields.length)),true);
 			if (result != null) {
+				LinkedList<Tuple> removedTuples = null;
+				removedTuples.add(result);
+				notifySpaceEvent(new SpaceEvent(ActionType.GET,removedTuples));
 				return result.getTuple();
+				
 			}
 			wait();
 		
@@ -332,6 +341,9 @@ public class SequentialSpace implements Space {
 			if (spaceCondition.test(this)) {
 				Tuple result = findTuple(p,new Template(Arrays.copyOf(fields,fields.length)),true);
 				if (result != null) {
+					LinkedList<Tuple> removedTuples = null;
+					removedTuples.add(result);
+					notifySpaceEvent(new SpaceEvent(ActionType.GET,removedTuples));
 					return result.getTuple();
 				}
 				wait();
@@ -371,29 +383,23 @@ public class SequentialSpace implements Space {
 
 	@Override
 	public <T> boolean registerMeasure(SpaceMeasurement<T> measure) {
+		//inizialize the measure object with the space
 		measure.init(this);
         addListener(new MeasureListener(measure));
 		return true;
 	}
 	
-	@Override  //viene inserito il listener degli eventi
-	public  boolean registerEvent() {
-		
-        addListener(new SpaceEventListener());
-		return true;
-	}
-	
 	private void notifySpaceEvent(SpaceEvent e) { 
 		
-		//avviso tutti i listener di un nuovo evento
+		//notify all active listeners
 		for (SpaceListener l : listeners) {
-			l.handle(e);// i listener valutano il tipo di evento e agiscono di conseguenza
+			l.handle(e);
 		} 
 	
 	}
 
 	@Override
-	public synchronized LinkedList<Object[]> getAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) {
+	public synchronized List<Object[]> getAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) {
 		if (spaceCondition.test(this)) {
 			LinkedList<Object[]> result = findAllTuples(p,new Template(Arrays.copyOf(fields,fields.length)),true);
 			if (result.size()>0) {
@@ -404,6 +410,18 @@ public class SequentialSpace implements Space {
 		
 		return null;
 	}
+	
+	@Override
+	public synchronized List<Object[]> getAll( Predicate<Object[]> p, TemplateField[] fields) {
+	
+			LinkedList<Object[]> result = findAllTuples(p,new Template(Arrays.copyOf(fields,fields.length)),true);
+			if (result.size()>0) {
+				notifyAll();
+			}
+			return result;
+		
+		
+	}
 
 	@Override
 	public List<Object[]> queryAll(Predicate<Space> spaceCondition, Predicate<Object[]> p, TemplateField[] fields) {
@@ -413,6 +431,14 @@ public class SequentialSpace implements Space {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public List<Object[]> queryAll(Predicate<Object[]> p, TemplateField[] fields) throws InterruptedException {
+		
+			LinkedList<Object[]> result = findAllTuples(p,new Template(Arrays.copyOf(fields,fields.length)),false);
+			return result;
+
 	}
 
 	
