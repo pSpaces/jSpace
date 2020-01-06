@@ -52,6 +52,7 @@ public class RandomSpace extends SequentialSpace {
 	
 	// New version: does not provide uniform distribution on matching tuples but is more performant
 	protected Tuple findTuple(Template template,boolean toRemove) {
+		if (tuples.size() == 0) return null;
 		Tuple t;
 		int j = 0;
 		int startI =  random.nextInt(tuples.size());
