@@ -26,6 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -105,7 +106,13 @@ public class TestRemoteSpace {
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
 		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/another?keep");
-		assertNull(rs.get(new ActualField(1)));
+		
+		try {
+			rs.get(new ActualField(1));
+			fail();
+		} catch (InterruptedException e) {
+		}
+
 		sr.closeGates();
 	}
 
@@ -116,7 +123,11 @@ public class TestRemoteSpace {
 		Space aSpace = new SequentialSpace();
 		sr.add("target", aSpace);
 		RemoteSpace rs = new RemoteSpace("tcp://127.0.0.1:9990/another?keep");
-		assertNull(rs.query(new ActualField(1)));
+		try {
+			rs.query(new ActualField(1));
+			fail();
+		} catch (InterruptedException e) {
+		}
 		sr.closeGates();
 	}
 
@@ -220,5 +231,4 @@ public class TestRemoteSpace {
 		sr.addGate(uri);
 		sr.closeGate(uri);
 	}
-	
 }

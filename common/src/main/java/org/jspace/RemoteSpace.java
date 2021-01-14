@@ -91,6 +91,7 @@ public class RemoteSpace implements Space {
 			//TODO: Replace with a specific exception
 			throw new InterruptedException(e.getMessage());
 		} 
+
 		if (response.isSuccessful()) {
 			List<Object[]> tuples = response.getTuples();
 			if (tuples.size()==0) {
@@ -98,6 +99,8 @@ public class RemoteSpace implements Space {
 			}
 			return tuples.get(0);
 		}
+
+		if (isBlocking) throw new InterruptedException("remote space does not exist!");
 		return null;
 	}
 
@@ -113,6 +116,7 @@ public class RemoteSpace implements Space {
 		if (response.isSuccessful()) {
 			return response.getTuples();
 		} 
+		
 		return null;		
 	}
 
@@ -134,6 +138,7 @@ public class RemoteSpace implements Space {
 		} catch (IOException e) {
 			throw new InterruptedException(e.getMessage());
 		} 
+
 		if (response.isSuccessful()) {
 			List<Object[]> tuples = response.getTuples();
 			if (tuples.size()==0) {
@@ -141,6 +146,8 @@ public class RemoteSpace implements Space {
 			}
 			return tuples.get(0);
 		}
+		
+		if (isBlocking) throw new InterruptedException("remote space does not exist!");
 		return null;
 	}
 
