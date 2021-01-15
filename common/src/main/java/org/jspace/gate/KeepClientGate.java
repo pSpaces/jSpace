@@ -68,13 +68,19 @@ public class KeepClientGate implements ClientGate {
 	
 	@Override
 	public ServerMessage send(ClientMessage m) throws IOException, InterruptedException {
-		String sessionId = ""+(sessionCounter++);
-		m.setTarget(target);
-		m.setClientSession(sessionId);
+		String sessionId;
+		
 		synchronized (outbox) {
+			sessionId = ""+sessionCounter;
+			sessionCounter++;
+			
+			m.setTarget(target);
+			m.setClientSession(sessionId);
+
 			outbox.add(m);
 			outbox.notify();
 		}
+		
 		return inbox.call(sessionId);
 	}
 
