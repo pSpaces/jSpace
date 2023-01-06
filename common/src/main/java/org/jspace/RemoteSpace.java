@@ -57,8 +57,7 @@ public class RemoteSpace implements Space {
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotImplementedException("RemoteSpace does not support the `size()` method");
 	}
 
 	@Override
