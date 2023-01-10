@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.jspace.gate.ClientGate;
 import org.jspace.gate.GateFactory;
 import org.jspace.protocol.ClientMessage;
