@@ -31,8 +31,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import javax.swing.plaf.SliderUI;
-
 import org.jspace.ActualField;
 import org.jspace.RemoteSpace;
 import org.jspace.SequentialSpace;
@@ -222,7 +220,7 @@ public class TestRemoteSpace {
 		sr.closeGates();
 	}
 
-	//@Test
+	@Test
 	public void testCloseGate() {
 		String uri = "tcp://127.0.0.1:9994/?keep";
 		
