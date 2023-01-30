@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Michele Loreti and the jSpace Developers (see the included 
+ * Copyright (c) 2017 Michele Loreti and the jSpace Developers (see the included
  * authors file).
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +26,9 @@ package org.jspace.gate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
@@ -43,8 +42,7 @@ import org.jspace.util.Rendezvous;
  *
  */
 public class KeepClientGate implements ClientGate {
-	
-	
+
 	private final jSpaceMarshaller marshaller;
 	private String host;
 	private int port;
@@ -57,6 +55,12 @@ public class KeepClientGate implements ClientGate {
 	private boolean status = true;
 	private int sessionCounter = 0;
 
+	/**
+	 * Fields used in tests to access (via the Reflection API) the threads if needed.
+	 */
+	private Thread outboxThread;
+	private Thread inboxThread;
+
 	public KeepClientGate( jSpaceMarshaller marshaller , String host, int port, String target) {
 		this.marshaller = marshaller;
 		this.host = host;
@@ -65,22 +69,25 @@ public class KeepClientGate implements ClientGate {
 		this.inbox = new Rendezvous<>();
 		this.outbox = new LinkedList<>();
 	}
-	
+
 	@Override
 	public ServerMessage send(ClientMessage m) throws IOException, InterruptedException {
 		String sessionId;
-		
+
 		synchronized (outbox) {
+			if (!this.status) {
+				throw new InterruptedException("Gate is closed!");
+			}
 			sessionId = ""+sessionCounter;
 			sessionCounter++;
-			
+
 			m.setTarget(target);
 			m.setClientSession(sessionId);
 
 			outbox.add(m);
 			outbox.notify();
 		}
-		
+
 		return inbox.call(sessionId);
 	}
 
@@ -89,27 +96,31 @@ public class KeepClientGate implements ClientGate {
 		this.socket = new Socket(host, port);
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.writer = new PrintWriter(socket.getOutputStream());
-		new Thread( () -> outboxHandlingMethod() ).start();
-		new Thread( () -> inboxHandlingMethod() ).start();
+		this.outboxThread = new Thread(() -> outboxHandlingMethod());
+		this.inboxThread = new Thread(() -> inboxHandlingMethod());
+		this.outboxThread.start();
+		this.inboxThread.start();
 	}
 
 	@Override
 	public void close() throws IOException {
-		this.status = false;
 		synchronized (outbox) {
+			this.status = false;
 			outbox.notify();
 		}
+		this.socket.close();
+		// Closing the socket above should also close the reader and writer.
 		this.reader.close();
 		this.writer.close();
-		this.socket.close();
+		inbox.interruptAll();
 	}
 
-	
+
 	private void outboxHandlingMethod() {
 		try {
 			synchronized (outbox) {
 				while (status) {
-					while (status&&outbox.isEmpty()) {
+					while (status && outbox.isEmpty()) {
 						outbox.wait();
 					}
 					if (status) {
@@ -120,26 +131,43 @@ public class KeepClientGate implements ClientGate {
 		} catch (InterruptedException e) {
 			// TODO Add Log!
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	private void inboxHandlingMethod() {
 		try {
 			while (true) {
 				ServerMessage m = marshaller.read(ServerMessage.class, reader);
 				if (m != null) {
 					String session = m.getClientSession();
-					if ((session != null)&&(inbox.canSet(session))) {
+					if (session != null && inbox.canSet(session)) {
 						inbox.set(session, m);
 					} else {
-						//TODO: Add Log!
+						// TODO: Add Log!
 						System.err.println("Unexpected session id!");
 					}
+				} else {
+					// m == null ==> EOF ==> Socket was closed from server.
+					this.close();
+					break;
 				}
 			}
 		} catch (IOException e) {
+			synchronized (outbox) {
+				if (!this.status) {
+					// Socket was closed by this client.
+					return;
+				}
+			}
 			// TODO Add Log!
 			e.printStackTrace();
+			try {
+				// The gate should be closed in this case.
+				this.close();
+			} catch (IOException e2) {
+				// TODO Add Log!
+				e2.printStackTrace();
+			}
 		}
 	}
 

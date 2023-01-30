@@ -23,6 +23,7 @@
 package org.jspace.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * This class supports the coordination of threads activities based on rendezvous data synchronization.
@@ -45,6 +46,11 @@ public class Rendezvous<T,V> {
 	 * wrapper for values.
 	 */
 	protected final HashMap<T,DataWrapper> data = new HashMap<>();
+	
+	/**
+	 * Set of threads currently waiting for incoming messages.
+	 */
+	protected final HashSet<Thread> waitingThreads = new HashSet<>();
 		
 	/**
 	 * Creates a new synchronization map.
@@ -73,7 +79,14 @@ public class Rendezvous<T,V> {
 				data.put(tag, wrapper);
 			}
 		}
-		return wrapper.get();
+		synchronized (waitingThreads) {
+			waitingThreads.add(Thread.currentThread());
+		}
+		V result = wrapper.get();
+		synchronized (waitingThreads) {
+			waitingThreads.remove(Thread.currentThread());
+		}
+		return result;
 	}
 
 	/**
@@ -188,6 +201,22 @@ public class Rendezvous<T,V> {
 		synchronized (data) {
 			DataWrapper wrapper = data.get(tag);
 			return (wrapper == null)||(!wrapper.flag);
+		}
+	}
+
+	/**
+	 * Interrupts all currently waiting threads and clears their requests.
+	 * Intended to be called when closing a KeepClientGate (via a RemoteSpace).
+	 */
+	public void interruptAll() {
+		synchronized (waitingThreads) {
+			for (Thread t : waitingThreads) {
+				t.interrupt();
+			}
+			waitingThreads.clear();
+		}
+		synchronized (data) {
+			data.clear();
 		}
 	}
 }

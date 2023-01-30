@@ -194,19 +194,26 @@ public class SpaceRepository {
 	}
 	
 	private synchronized void addHandler(ClientHandler handler) {
+		if (executor.isShutdown()) {
+			return;
+		}
 		handlers.add(handler);
 		executor.execute(() -> {
 			try {
 				while (handler.isActive()) {
 					ClientMessage message = handler.receive();
 					if (message != null) {
-						executor.execute(() -> {
-							try {
-								handler.send(handle(message));
-							} catch (InterruptedException e) {
-								handler.send(ServerMessage.internalServerError());
+						synchronized (this) {
+							if (!executor.isShutdown()) {
+								executor.execute(() -> {
+									try {
+										handler.send(handle(message));
+									} catch (InterruptedException e) {
+										handler.send(ServerMessage.internalServerError());
+									}
+								});
 							}
-						});					
+						}					
 					}
 				}
 			} catch (IOException e) {

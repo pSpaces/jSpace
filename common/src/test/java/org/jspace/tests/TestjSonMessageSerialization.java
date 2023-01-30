@@ -78,7 +78,6 @@ public class TestjSonMessageSerialization {
 				new URI("pspace://127.0.0.1:8080/test?KEEP")
 		);
 		String data = gson.toJson(message);
-		System.out.println(data);
 		ClientMessage obtained = gson.fromJson(data, ClientMessage.class);
 		assertEquals(message,obtained);
 	}
