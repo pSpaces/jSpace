@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.jspace.io.jSpaceMarshaller;
 import org.jspace.protocol.ClientMessage;
@@ -59,7 +60,12 @@ public class KeepClientHandler implements ClientHandler {
 	 */
 	@Override
 	public ClientMessage receive() throws IOException {
-		ClientMessage message = marshaller.read(ClientMessage.class, reader);
+		ClientMessage message = null;
+		try {
+			message = marshaller.read(ClientMessage.class, reader);
+		} catch (SocketException e) {
+			// It's okay, just below we will set isActive to false, since the message is null
+		}
 		isActive  = (message != null);
 		return message;
 	}
@@ -96,5 +102,7 @@ public class KeepClientHandler implements ClientHandler {
 		return isClosed;
 	}
 
-	
+
 }
+
+
